@@ -1,0 +1,65 @@
+примеры взяты из https://github.com/omniti-labs/jsend
+
+ответ имеет три статуса
+- ok (успех запроса);
+- excepts (возникли исключительные ситуации);
+- error (возникли критические ошибки);
+
+1. OK (успех запроса);
+
+/posts/show:
+{
+    status : "ok",
+    data : {
+        "posts" : [
+            { "id" : 1, "title" : "A blog post", "body" : "Some useful content" },
+            { "id" : 2, "title" : "Another blog post", "body" : "More content" },
+        ]
+     }
+}
+/posts/show?id=2:
+{
+    status : "ok",
+    data : { "post" : { "id" : 2, "title" : "Another blog post", "body" : "More content" }}
+}
+/posts/delete?id=2:
+{
+    status : "ok",
+    data : null
+}
+/posts/update?id=2:
+{
+    status : "ok",
+    data : null
+}
+
+2. excepts (возникли исключительные ситуации);
+
+/posts/create:
+{
+    status : "excepts",
+    data : {
+        "title":"Слишком длинный заголовок",
+        "price":"Не указана цена"
+     }
+}
+
+3. error (возникли критические ошибки);
+
+/posts/show?id=2:
+{
+    status : "error",
+    "message" : "Данная страница не существует"
+}
+
+/posts/update?id=2:
+{
+    status : "error",
+    "message" : "Вы не имеете прав на данную операцию"
+}
+
+/posts/update?id=2:
+{
+    status : "error",
+    "message" : "Сервер не отвечает"
+}
