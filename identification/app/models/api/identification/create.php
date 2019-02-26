@@ -31,10 +31,10 @@ class Create
             // проверяем параметры
             $valid = $this->container['validators'];
             $vStLen = $valid->StringLength;
-            if(empty($login)){
+            if (empty($login)) {
                 $exceptions["login"] = "Не указан";
             }
-            if(empty($password)){
+            if (empty($password)) {
                 $exceptions["password"] = "Не указан";
             }
             if (!empty($exceptions)) {
@@ -55,7 +55,7 @@ class Create
             }
             // пишем в базу
             $db = $this->container['db'];
-            $q = "select * from users where login = '{$login}';";
+            $q = "select * from identifications where login = '{$login}';";
             $sth = $db->query($q, \PDO::FETCH_ASSOC);
             $user = $sth->fetch();
 
@@ -74,10 +74,11 @@ class Create
             return ["status" => "ok",
                 "data" => null];
         } catch (RuntimeException | \Exception $e) {
-            $exceptions['massege'] = $e->getMessage();
+
+            $exceptions["massege"] = $e->getMessage();
             return [
-                "status" => "excepts",
-                "data" => $exceptions
+                "status" => "except",
+                "data" => $exceptions,
             ];
         }
     }

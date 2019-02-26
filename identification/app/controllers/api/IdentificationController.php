@@ -3,9 +3,10 @@ namespace App\Controllers\Api;
 
 use \App\Controllers\MainController;
 use \App\Models\Api\Identification\Create as Create;
+use \App\Models\Api\Identification\Delete as Delete;
 use \App\Models\Api\Identification\Show as Show;
 use \App\Models\Api\Identification\Update as Update;
-use \App\Models\Api\Identification\Delete as Delete;
+
 class IdentificationController extends MainController
 {
 
@@ -14,13 +15,13 @@ class IdentificationController extends MainController
         $cont = $this->container;
         $reg = new Show($cont, $request, $response);
         $answer = $reg->run();
-        if ($answer['status']=="ok") {
+        if ($answer['status'] == "ok") {
             $response = $response->withJson($answer, 200);
         }
-        if ($answer['status']=="excepts") {
+        if ($answer['status'] == "except") {
             $response = $response->withJson($answer, 400);
         }
-        if ($answer['status']=="error") {
+        if ($answer['status'] == "error") {
             $response = $response->withJson($answer, 404);
         }
         return $response;
@@ -30,13 +31,13 @@ class IdentificationController extends MainController
         $cont = $this->container;
         $reg = new Create($cont, $request, $response);
         $answer = $reg->run();
-        if ($answer['status']=="ok") {
+        if ($answer['status'] == "ok") {
             $response = $response->withJson($answer, 200);
         }
-        if ($answer['status']=="excepts") {
+        if ($answer['status'] == "except") {
             $response = $response->withJson($answer, 400);
         }
-        if ($answer['status']=="error") {
+        if ($answer['status'] == "error") {
             $response = $response->withJson($answer, 404);
         }
         return $response;
@@ -47,13 +48,13 @@ class IdentificationController extends MainController
         $cont = $this->container;
         $reg = new Update($cont, $request, $response);
         $answer = $reg->run();
-        if ($answer['status']=="ok") {
+        if ($answer['status'] == "ok") {
             $response = $response->withJson($answer, 200);
         }
-        if ($answer['status']=="excepts") {
+        if ($answer['status'] == "except") {
             $response = $response->withJson($answer, 400);
         }
-        if ($answer['status']=="error") {
+        if ($answer['status'] == "error") {
             $response = $response->withJson($answer, 404);
         }
         return $response;
@@ -63,13 +64,13 @@ class IdentificationController extends MainController
         $cont = $this->container;
         $reg = new Delete($cont, $request, $response);
         $answer = $reg->run();
-        if ($answer['status']=="ok") {
+        if ($answer['status'] == "ok") {
             $response = $response->withJson($answer, 200);
         }
-        if ($answer['status']=="excepts") {
+        if ($answer['status'] == "except") {
             $response = $response->withJson($answer, 400);
         }
-        if ($answer['status']=="error") {
+        if ($answer['status'] == "error") {
             $response = $response->withJson($answer, 404);
         }
         return $response;
