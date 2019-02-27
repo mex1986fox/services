@@ -1,7 +1,7 @@
 <?php
 namespace App\Models\Api\Token;
 
-class Create
+class Authentificate
 {
     protected $request, $response, $container;
     public function __construct($container, $request, $response)
@@ -13,13 +13,12 @@ class Create
     }
     public function run()
     {
-        // создает новое поле в базе token
-        // записывает туда id пользователя логин и пароль
-        // данная операция доступна только доверенным сервисам
-        // от внешнего мира должна быть скрыта
+        // проводит аутентификацию access токена
+        // в случае успеха выдает true
         return [
             "status" => "ok",
             "data" => null,
         ];
+
     }
 }

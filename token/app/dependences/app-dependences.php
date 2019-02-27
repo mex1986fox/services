@@ -1,10 +1,4 @@
 <?php
-// добавляем в контейнер 
-// ip доверенных адресов наших сервисов
-$container['trusted_services'] = function ($c) {
-    return ["127.0.0.1"];
-};
-
 //добавляем в контейнер зависимостей PDO
 $container['db'] = function ($c) {
     $db = $c['settings']['db'];

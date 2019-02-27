@@ -1,8 +1,6 @@
 <?php
 namespace App\Models\Api\Token;
 
-use \Zend\Validator\Exception\RuntimeException as RuntimeException;
-
 class Delete
 {
     protected $request, $response, $container;
@@ -15,11 +13,11 @@ class Delete
     }
     public function run()
     {
-        // удаляет токен ы 
+        // удаляет токены refresh и access
         // используя refresh token
         return [
-            "status"=> "ok", 
-            "data" => null
-          ];
+            "status" => "ok",
+            "data" => null,
+        ];
     }
 }

@@ -10,9 +10,11 @@ CREATE TABLE "users" (
     PRIMARY KEY (user_id)
 );
 
-
--- таблица токенов для нуждаюшихся сервисов
+-- таблица токенов для аутентификации
 CREATE TABLE "tokens" (
     user_id bigint NOT NULL,
-    at_sekret_key text NOT NULL
+    access_tokens jsonb,
 );
+--access_tokens 
+--массив сигнатур доверенных токенов 
+--пример ["dfdf5445df54","dfg445fg34df"]
