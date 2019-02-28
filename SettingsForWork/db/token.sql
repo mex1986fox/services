@@ -2,11 +2,11 @@
 -- таблица токенов для сервеса аутентификации
 CREATE TABLE "tokens" (
     user_id bigint NOT NULL,
-    LOGIN varchar(64) NOT NULL UNIQUE,
-    PASSWORD varchar(32) NOT NULL,
+    login varchar(64) NOT NULL UNIQUE,
+    password varchar(32) NOT NULL,
     access_tokens jsonb,
     refresh_tokens jsonb,
-    PRIMARY KEY (user_id),
+    PRIMARY KEY (user_id)
 );
 
 --refresh_tokens, access_tokens
