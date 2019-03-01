@@ -4,8 +4,8 @@ CREATE TABLE "tokens" (
     user_id bigint NOT NULL,
     login varchar(64) NOT NULL UNIQUE,
     password varchar(32) NOT NULL,
-    access_tokens jsonb,
-    refresh_tokens jsonb,
+    access_tokens jsonb DEFAULT '{}',
+    refresh_tokens jsonb DEFAULT '{}',
     PRIMARY KEY (user_id)
 );
 

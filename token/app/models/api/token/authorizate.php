@@ -1,7 +1,7 @@
 <?php
 namespace App\Models\Api\Token;
 
-class Authentificate
+class Authorizate
 {
     protected $request, $response, $container;
     public function __construct($container, $request, $response)
@@ -13,7 +13,7 @@ class Authentificate
     }
     public function run()
     {
-        // проводит аутентификацию access токена
+        // проводит проверку access токена
         // в случае успеха выдает true
         return [
             "status" => "ok",

@@ -27,8 +27,6 @@ class Create
 
             // проверяем параметры
             $valid = $this->container['validators'];
-            //проверяем является ли доверенным сервисом
-            $vTrustedServices
             $vStLen = $valid->StringLength;
             if (empty($userID)) {
                 $exceptions["user_id"] = "Не указан.";

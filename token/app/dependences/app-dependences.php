@@ -1,4 +1,5 @@
 <?php
+
 //добавляем в контейнер зависимостей PDO
 $container['db'] = function ($c) {
     $db = $c['settings']['db'];
