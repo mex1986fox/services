@@ -1,5 +1,5 @@
 <?php
-namespace App\Models\Api\Token;
+namespace App\Models\Api\User;
 
 class Create
 {
@@ -13,24 +13,17 @@ class Create
     }
     public function run()
     {
-        // создает новое поле в базе token
-        // записывает туда id пользователя логин и пароль
-        // данная операция доступна только доверенным сервисам
-        // от внешнего мира должна быть скрыта
+        // создает новых юзеров
         try {
             // передаем параметры в переменные
             $p = $this->request->getQueryParams();
             $exceptions = [];
-            $userID = $p["user_id"];
             $login = $p["login"];
             $password = $p["password"];
 
             // проверяем параметры
             $valid = $this->container['validators'];
             $vStLen = $valid->StringLength;
-            if (empty($userID)) {
-                $exceptions["user_id"] = "Не указан.";
-            }
             if (empty($login)) {
                 $exceptions["login"] = "Не указан.";
             }
@@ -39,10 +32,6 @@ class Create
             }
             if (!empty($exceptions)) {
                 throw new \Exception("Ошибки в параметрах.");
-            }
-            $vStLen->setMin(1);
-            if (!$vStLen->isValid($userID)) {
-                $exceptions["user_id"] = "Не соответсвует диапозону длины.";
             }
             $vStLen->setMin(1);
             $vStLen->setMax(64);
@@ -57,28 +46,41 @@ class Create
             if (!empty($exceptions)) {
                 throw new \Exception("Ошибки в параметрах.");
             }
-            // проверяем наличие в базе
 
             // пишем в базу
             $db = $this->container['db'];
-            $q = "insert into tokens
-                    (user_id, login, password )
+            $q = "insert into users
+                    (login)
                 values
-                    ({$userID},'{$login}',md5('{$password}'))
-                returning user_id;";
+                    ('{$login}')
+                returning *;";
             $sth = $db->query($q, \PDO::FETCH_ASSOC);
             $user = $sth->fetch();
 
-            if (!isset($user["user_id"])) {
+            if (!isset($user["id"])) {
                 throw new \Exception("Запись в базу не удалась.");
+            }
+            // посылаем запрос к микросервису токенов
+            // для создания токена для юзера
+            $apiReqwests = $this->container['api-requests'];
+            $rCreateToken = $apiReqwests->RequestCreateToken;
+            $statusCreateToken = $rCreateToken->go(["user_id" => $user["id"], "login" => $login, "password" => $password]);
+            // если не удалось создать токен
+            if ($statusCreateToken == false) {
+
+                $q = "delete from users * where id={$user["id"]}";
+                $sth = $db->query($q, \PDO::FETCH_ASSOC);
+                $user = $sth->fetch();
+                throw new \Exception("Токен не создан.");
             }
             // отправить всем сервисам запросы на удаление токенов
             return ["status" => "ok",
                 "data" => null,
             ];
         } catch (RuntimeException | \Exception $e) {
+
             $exceptions["massege"] = $e->getMessage();
-            if (strpos($exceptions["massege"], 'Ключ "(user_id)=(') !== false) {
+            if (strpos($exceptions["massege"], 'Ключ "(id)=(') !== false) {
                 $exceptions["user_id"] = "Уже существует.";
             }
             if (strpos($exceptions["massege"], 'Ключ "(login)=(') !== false) {
@@ -89,6 +91,5 @@ class Create
                 "data" => $exceptions,
             ];
         }
-
     }
 }

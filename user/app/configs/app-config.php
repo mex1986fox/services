@@ -9,7 +9,11 @@ return [
             'port' => '5432',
             'user' => "suser",
             'pass' => "suser",
-            'dbname' => "tokens",
+            'dbname' => "users",
         ],
+    ],
+    'hosts' => [
+        'this' => '127.0.0.1',
+        'services' => 'services.ru',
     ],
 ];

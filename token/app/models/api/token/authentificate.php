@@ -1,6 +1,7 @@
 <?php
 namespace App\Models\Api\Token;
 
+use \App\Services\Structur\TokenStructur;
 use \Zend\Validator\Exception\RuntimeException as RuntimeException;
 
 class Authentificate
@@ -66,67 +67,28 @@ class Authentificate
                 throw new \Exception("Ошибки в параметрах.");
             }
 
-            // проверить есть ли актуальный refresh токен
-            // если есть проверить время жизни refresh токена
-            // если срок актуален отдать старый
-            if ($user["refresh_tokens"]) {
-                $rt_SecretKey = current(json_decode($user["refresh_tokens"], true));
-                $rt_Signature = key(json_decode($user["refresh_tokens"], true));
-                $rt_HPEncode=openssl_decrypt($rt_Signature, 'AES256', hex2bin($rt_SecretKey), 0, hex2bin($rt_SecretKey));
-                $rt_exp=explode(".",$rt_HPEncode);
-                
-               echo $AccessTokenHeader=base64_decode($rt_exp[0]);
-               echo $AccessTokenPayload=base64_decode($rt_exp[1]);
-            }
-
-            // проверить есть ли актуальный access токен
-            // если есть проверить время жизни access токена
-            // если срок актуален отдать старый
-
             // создаем токены доступа
-            // alg - алгоритм шифрования
-            // exp – дата истечения срока действия
-            // iat – время создания
-            $AccessTokenHeader = '{"alg":"HS256","typ":"JWT"}';
-            $AccessTokenIat = time(); //время создания токена
-            $AccessTokenExp = (time() + (30 * 60)); //время смерти токена после которого он не актуален
-            $AccessTokenPayload = '{"userID": 15,"iat": ' . $AccessTokenIat . ', "exp":' . $AccessTokenExp . '}';
-            $AccessTokenHPEncode = base64_encode($AccessTokenHeader) . "." . base64_encode($AccessTokenPayload);
-            // $AccessTokenSecretKey = uniqid(rand(), 0);
-            $ivlen = openssl_cipher_iv_length('AES256');
-            $AccessTokenSecretKey = openssl_random_pseudo_bytes($ivlen);
-            
-            $AccessTokenSignature = openssl_encrypt($AccessTokenHPEncode, 'AES256', $AccessTokenSecretKey, 0, $AccessTokenSecretKey);
-            $AccessToken = $AccessTokenHPEncode . "." . $AccessTokenSignature;
+            $accessToken = new TokenStructur();
+            $accessToken->initAccessToken($user["user_id"]);
 
-            $RefreshTokenHeader = '{"alg":"HS256","typ":"JWT"}';
-            $RefreshTokenIat = time(); //время создания токена
-            $RefreshTokenExp = (time() + (30 * 24 * 60 * 60)); //время смерти токена после которого он не актуален
-            $RefreshTokenPayload = '{"userID": 15,"iat": ' . $RefreshTokenIat . ', "exp":' . $RefreshTokenExp . '}';
-            $RefreshTokenHPEncode = base64_encode($RefreshTokenHeader) . "." . base64_encode($RefreshTokenPayload);
-            //$RefreshTokenSecretKey = uniqid(rand(), 0);
-            $ivlen = openssl_cipher_iv_length('AES256');
-            $RefreshTokenSecretKey = openssl_random_pseudo_bytes($ivlen);
-            $RefreshTokenSignature = openssl_encrypt($RefreshTokenHPEncode, 'AES256', $RefreshTokenSecretKey, 0, $RefreshTokenSecretKey);
-            $RefreshToken = $RefreshTokenHPEncode . "." . $RefreshTokenSignature;
+            $refreshToken = new TokenStructur();
+            $refreshToken->initRefreshToken($user["user_id"]);
 
-            // записываем в базу токены
-            // пишем в базу
-            $AccessTokenSecretKeyB=bin2hex($AccessTokenSecretKey);
-            $RefreshTokenSecretKeyB=bin2hex($RefreshTokenSecretKey);
             $q = "update tokens
-                set access_tokens = '{\"{$AccessTokenSignature}\":\"{$AccessTokenSecretKeyB}\"}'::jsonb,
-                    refresh_tokens = '{\"{$RefreshTokenSignature}\":\"{$RefreshTokenSecretKeyB}\"}'::jsonb
-                where login = '{$login}' returning *;";
+                    set access_tokens = '{\"{$accessToken->getSignature()}\":\"{$accessToken->getSecretKey()}\"}'::jsonb,
+                        refresh_tokens = '{\"{$refreshToken->getSignature()}\":\"{$refreshToken->getSecretKey()}\"}'::jsonb
+                    where login = '{$login}' returning *;";
             $sth = $db->query($q, \PDO::FETCH_ASSOC);
             $user = $sth->fetch();
 
             if (!isset($user["user_id"])) {
                 throw new \Exception("Запись в базу не удалась.");
             }
-            //  update tokens set access_tokens = access_tokens || '{"65a4b":"c106908"}'::jsonb where login = 'fifa22';
             return ["status" => "ok",
-                "data" => $user,
+                "data" => [
+                    "access_token" => $accessToken->getToken(),
+                    "refresh_token" => $refreshToken->getToken(),
+                ],
             ];
         } catch (RuntimeException | \Exception $e) {
 
@@ -137,4 +99,5 @@ class Authentificate
             ];
         }
     }
+
 }

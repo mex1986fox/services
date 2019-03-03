@@ -4,7 +4,7 @@
 return [
     "ip" => ["192.168.20.230", "127.0.0.1"],
     "paths" => [
-        "/api/token/create",
-        "/api/token/authorizate",
+        // "/api/token/create",
+        // "/api/token/authorizate"
     ],
 ];
