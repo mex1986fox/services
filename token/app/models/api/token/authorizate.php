@@ -21,14 +21,14 @@ class Authorizate
             // передаем параметры в переменные
             $p = $this->request->getQueryParams();
             $exceptions = [];
-            $accessToken = $p["access_token"];
 
             // проверяем параметры
             // указан ли токен
-            if (empty($accessToken)) {
+            if (empty($p["access_token"])) {
                 $exceptions["access_token"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
             }
+            $accessToken = $p["access_token"];
             $token = new TokenStructur();
             $token->setToken($accessToken);
             //ищем ключ от токена

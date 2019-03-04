@@ -1,7 +1,5 @@
 <?php
-namespace App\Models\Api\User;
-
-use \App\Services\Structur\TokenStructur;
+namespace App\Models\Api\Token;
 
 class Delete
 {
@@ -15,31 +13,37 @@ class Delete
     }
     public function run()
     {
-        // удаляет юзеров
+        // удаляет токен по id пользователя
+        // доступен только для доверенных сервисов
 
         try {
             // передаем параметры в переменные
             $p = $this->request->getQueryParams();
             $exceptions = [];
-            if (empty($p["access_token"])) {
-                $exceptions["access_token"] = "Не указан.";
-            }
-            if (!empty($exceptions)) {
-                throw new \Exception("Ошибки в параметрах.");
-            }
-            $accessToken = $p["access_token"];
 
             // проверяем параметры
-            // записываем токен в структуру
-            $accessToken = $p["access_token"];
-            $token = new TokenStructur();
-            $token->setToken($accessToken);
-            //  проверяем токен
-            $valid = $this->container['validators'];
-            $vToken = $valid->TokenValidator;
-            if (!$vToken->isValid($token)) {
-                $exceptions["access_token"] = "Не действителен.";
+            // указан ли токен
+            if (empty($p["user_id"])) {
+                $exceptions["user_id"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
+            }
+            $userID = $p["user_id"];
+
+            // проверяем параметры
+            $valid = $this->container['validators'];
+            $vDigits = $valid->Digits;
+            if (!$vDigits->isValid($userID)) {
+                $exceptions["user_id"] = "Не соответствет заданному типу.";
+                throw new \Exception("Ошибки в параметрах.");
+            }
+
+            $db = $this->container['db'];
+           $q = "update tokens set access_tokens = '[]'::jsonb where user_id = {$userID} returning *;";
+            $sth = $db->query($q, \PDO::FETCH_ASSOC);
+            $user = $sth->fetch();
+
+            if (!isset($user["user_id"])) {
+                throw new \Exception("Запись в базу не удалась.");
             }
 
             return ["status" => "ok",

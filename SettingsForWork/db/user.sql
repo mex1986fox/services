@@ -20,7 +20,7 @@ CREATE TABLE "users" (
 
 -- таблица токенов для аутентификации
 CREATE TABLE "tokens" (
-    user_id bigint NOT NULL,
+    user_id bigint UNIQUE NOT NULL,
     access_tokens jsonb
 );
 -- access_tokens токены проверенные которым можно доверять

@@ -25,7 +25,7 @@ $container['filters'] = function ($c) {
 //добавляем в контейнер зависимостей валидаторы
 // валидаторы взяты из Zend Fr. 3
 $container['validators'] = function ($c) {
-    $validators = new \App\Services\Validator\ValidatorFactory();
+    $validators = new \App\Services\Validator\ValidatorFactory($c);
     return $validators;
 };
 //добавляем в контейнер сервисы авторизации
