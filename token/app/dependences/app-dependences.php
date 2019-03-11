@@ -33,3 +33,8 @@ $container['auths'] = function ($c) {
     $auths = new \App\Services\Auth\FactoryAuth($c);
     return $auths;
 };
+//добавляем в контейнер сервисы авторизации
+$container['api-requests'] = function ($c) {
+    $request = new \App\Services\ApiRequests\FactoryApiRequest($c);
+    return $request;
+};

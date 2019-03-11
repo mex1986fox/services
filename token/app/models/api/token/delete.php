@@ -57,6 +57,14 @@ class Delete
                 $exceptions["access_token"] = "Истекло время жизни токена.";
                 throw new \Exception("Ошибки в параметрах.");
             }
+            // отправить запросы на удаление токенов у микросервисов
+            $apiReqwests = $this->container['api-requests'];
+            $rCreateToken = $apiReqwests->RequestDeleteTokens;
+            $statusDeleteTokens = $rCreateToken->go(["user_id" => $token->getUserID()]);
+            // если не удалось создать токен
+            if ($statusCreateToken == false) {
+                throw new \Exception("На сервисах удаление не произошло.");
+            }
 
             $q = "update tokens
             set access_tokens = '{}'::jsonb,
@@ -68,6 +76,9 @@ class Delete
             if (!isset($user["user_id"])) {
                 throw new \Exception("Запись в базу не удалась.");
             }
+
+
+
             return [
                 "status" => "ok",
                 "data" => null,
