@@ -11,10 +11,11 @@ return [
             'pass' => "suser",
             'dbname' => "tokens",
         ],
-        "shosts"=>[
-            "token"=>"token.ru",
-            "asynchreq"=>"asynchreq.ru:8083",
-            "user"=>"user.ru"
-        ]
+
+    ], 
+    "services" => [
+        "token" => ["sheme" => "http", "host" => "token.ru", "port" => 8081],
+        "asynchreq" => ["sheme" => "http", "host" => "asynchreq.ru", "port" => 8083],
+        "user" => ["sheme" => "http", "host" => "user.ru", "port" => 8082],
     ],
 ];

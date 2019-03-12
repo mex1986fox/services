@@ -36,9 +36,11 @@ var config Config
 // 		Data: "[id:10, name:"user"]"
 // 	}
 type AsynchRequest struct {
-	Host string
-	Url  string
-	Data string
+	Host  string
+	Port  string
+	Sheme string
+	Url   string
+	Data  string
 }
 
 // пул очередей асинхронных запросов
@@ -62,6 +64,8 @@ var pullChanAR PullChanAR = PullChanAR{}
 
 func requestCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+
+	//vars := mux.Vars(r)
 	//проверить от кого запрос
 	flagTrustIP := false
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
@@ -79,34 +83,38 @@ func requestCreate(w http.ResponseWriter, r *http.Request) {
 		w.Write(js)
 		return
 	}
-	host := r.URL.Query().Get("host")
-	if host == "" {
-		host = r.FormValue("host")
-	}
+	host := r.FormValue("host")
 	if host == "" {
 		js := json.RawMessage(`{"status":"except", "data":{"massege":"Ошибки в запросе.","host":"Не указан."}}`)
 		w.Write(js)
 		return
 	}
-	url := r.URL.Query().Get("url")
+	sheme := r.FormValue("sheme")
 	if host == "" {
-		url = r.FormValue("url")
+		js := json.RawMessage(`{"status":"except", "data":{"massege":"Ошибки в запросе.","sheme":"Не указан."}}`)
+		w.Write(js)
+		return
 	}
+	port := r.FormValue("port")
+	if host == "" {
+		js := json.RawMessage(`{"status":"except", "data":{"massege":"Ошибки в запросе.","port":"Не указан."}}`)
+		w.Write(js)
+		return
+	}
+	url := r.FormValue("url")
 	if url == "" {
 		js := json.RawMessage(`{"status":"except", "data":{"massege":"Ошибки в запросе.","url":"Не указан."}}`)
 		w.Write(js)
 		return
 	}
-	data := r.URL.Query().Get("data")
-	if host == "" {
-		data = r.FormValue("data")
-	}
-
+	data := r.FormValue("data")
 	// создать запрос
 	asynchRequest := AsynchRequest{
-		Host: host,
-		Url:  url,
-		Data: data,
+		Host:  host,
+		Url:   url,
+		Data:  data,
+		Sheme: sheme,
+		Port:  port,
 	}
 
 	// проверить существование очереди
@@ -117,9 +125,7 @@ func requestCreate(w http.ResponseWriter, r *http.Request) {
 		if len(pullChanAR[asynchRequest.Host]) < config.ChanLen {
 			pullChanAR[asynchRequest.Host] <- asynchRequest
 		}
-
 	} else {
-
 		// создать пул очередь объемом в chanLen запросов
 		var _chanAR = make(chan AsynchRequest, config.ChanLen)
 		pullChanAR[asynchRequest.Host] = _chanAR
@@ -157,6 +163,7 @@ func TransleterAR(name string, chanAR chan AsynchRequest) {
 			for i := 0; i < len(chanAR); i++ {
 				pullAR = append(pullAR, <-chanAR)
 			}
+			fmt.Println(pullAR)
 		}
 
 		// если есть запросы обрабатываем их
@@ -164,7 +171,7 @@ func TransleterAR(name string, chanAR chan AsynchRequest) {
 			asReq := pullAR[0]
 			data := []byte(asReq.Data)
 			r := bytes.NewReader(data)
-			resp, err := http.Post(fmt.Sprint(asReq.Host, asReq.Url), "application/json", r)
+			resp, err := http.Post(fmt.Sprint(asReq.Sheme, "://", asReq.Host, ":", asReq.Port, asReq.Url), "application/json", r)
 			if err != nil {
 				sugar.Info("T: ", time.Now().Format(time.RFC3339),
 					" MSG: ", "Выполнен запрос с ошибкой",
@@ -172,10 +179,11 @@ func TransleterAR(name string, chanAR chan AsynchRequest) {
 				)
 
 			} else {
-				// bs := make([]byte, 1014)
-				// n, _ := resp.Body.Read(bs)
-				// fmt.Println(string(bs[:n]))
-				// fmt.Println("Выполнил запрос: ", asReq.Host, asReq.Url)
+				fmt.Println("Выполнил запрос: ", asReq.Sheme, "://", asReq.Host, ":", asReq.Port, asReq.Url)
+				bs := make([]byte, 10014)
+				n, _ := resp.Body.Read(bs)
+				fmt.Println(string(bs[:n]))
+
 				resp.Body.Close()
 			}
 			pullAR = pullAR[1:]

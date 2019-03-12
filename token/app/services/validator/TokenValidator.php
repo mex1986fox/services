@@ -24,6 +24,7 @@ class TokenValidator extends AbstractValidator
 
         $this->token = $token;
         $checkToken = openssl_decrypt(str_replace(' ', '+', $token->getSignature()), $token->getAlg(), hex2bin($this->tokenKey), 0, hex2bin($this->tokenKey));
+        
         if ($checkToken == $token->getHP()) {
             return true;
         }
@@ -32,6 +33,7 @@ class TokenValidator extends AbstractValidator
     public function isValidLifeTime()
     {
         $tokenLifeTime = $this->token->getLifeTime();
+     
         if (time() < $tokenLifeTime) {
             return true;
         }

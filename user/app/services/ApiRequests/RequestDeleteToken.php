@@ -1,7 +1,7 @@
 <?php
 namespace App\Services\ApiRequests;
 
-class RequestAuthorizateToken
+class RequestDeleteToken
 {
     protected $container;
     public function __construct($container)
@@ -14,7 +14,7 @@ class RequestAuthorizateToken
         $sToken = $this->container["services"]["token"];
         $jsonDataEncoded = json_encode($params);
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $sToken["sheme"]."://".$sToken["host"] .":".$sToken["port"] . "/api/token/authorizate");
+        curl_setopt($ch, CURLOPT_URL, $sToken["sheme"]."://".$sToken["host"] .":".$sToken["port"] . "/api/token/delete");
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDataEncoded);

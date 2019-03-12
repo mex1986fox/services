@@ -9,7 +9,7 @@ return [
             'port' => '5432',
             'user' => "suser",
             'pass' => "suser",
-            'dbname' => "users",
+            'dbname' => "dependences",
         ],
     ],
     "services" => [

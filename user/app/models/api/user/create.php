@@ -18,21 +18,20 @@ class Create
             // передаем параметры в переменные
             $p = $this->request->getQueryParams();
             $exceptions = [];
-            $login = $p["login"];
-            $password = $p["password"];
-
-            // проверяем параметры
-            $valid = $this->container['validators'];
-            $vStLen = $valid->StringLength;
-            if (empty($login)) {
+            if (empty($p["login"])) {
                 $exceptions["login"] = "Не указан.";
             }
-            if (empty($password)) {
+            if (empty($p["password"])) {
                 $exceptions["password"] = "Не указан.";
             }
             if (!empty($exceptions)) {
                 throw new \Exception("Ошибки в параметрах.");
             }
+            $login = $p["login"];
+            $password = $p["password"];
+            // проверяем параметры
+            $valid = $this->container['validators'];
+            $vStLen = $valid->StringLength;
             $vStLen->setMin(1);
             $vStLen->setMax(64);
             if (!$vStLen->isValid($login)) {
@@ -49,11 +48,8 @@ class Create
 
             // пишем в базу
             $db = $this->container['db'];
-            $q = "insert into users
-                    (login)
-                values
-                    ('{$login}')
-                returning *;";
+            $q =
+                "insert into users (login) values ('{$login}') returning *;";
             $sth = $db->query($q, \PDO::FETCH_ASSOC);
             $user = $sth->fetch();
 

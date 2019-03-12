@@ -1,7 +1,7 @@
 <?php
 namespace App\Services\ApiRequests;
 
-class RequestDeleteTokens
+class RequestUpdateTokens
 {
     protected $container;
     public function __construct($container)
@@ -11,6 +11,7 @@ class RequestDeleteTokens
     public function go(array $params = [])
     {
         $userID = $params["user_id"];
+        $accessToken = $params["access_token"];
         $services = $this->container["services"];
        $serviceAR = $this->container["services"]["asynchreq"];
         $flagErr = false;
@@ -19,8 +20,8 @@ class RequestDeleteTokens
                $rparams = 'host=' . $servic["host"] .
                     '&port=' . $servic["port"] .
                     '&sheme=' . $servic["sheme"] .
-                    '&url=/api/token/delete' .
-                    '&data={"user_id":' . $userID . '}';
+                    '&url=/api/token/update' .
+                    '&data={"user_id":' . $userID . ',"access_token":"'.$accessToken.'"}';
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $serviceAR["sheme"]."://".$serviceAR["host"] .":".$serviceAR["port"]. "/api/request/create");
                 curl_setopt($ch, CURLOPT_POST, true);
