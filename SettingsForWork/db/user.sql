@@ -12,7 +12,7 @@ CREATE TABLE "users" (
     name varchar(64),
     surname varchar(64),
     birthdate date,
-    settlement_id smallint,
+    city_id smallint,
     phone varchar(20),
     email varchar(256),
     PRIMARY KEY (id)
@@ -23,4 +23,28 @@ CREATE TABLE "tokens" (
     user_id bigint UNIQUE NOT NULL,
     access_tokens jsonb
 );
--- access_tokens токены проверенные которым можно доверять
+
+-- страны
+CREATE table "countries" (
+    country_id smallint UNIQUE NOT NULL,
+    name varchar(64) NOT NULL,
+    PRIMARY KEY (country_id)
+);
+-- субъекты (области, края)
+CREATE TABLE "subjects" (
+    subject_id smallint UNIQUE NOT NULL,
+    country_id smallint NOT NULL,
+    name varchar(64) NOT NULL,
+    PRIMARY KEY (subject_id),
+    FOREIGN KEY (country_id) REFERENCES countries (country_id) ON DELETE CASCADE
+);
+-- населенные пункты (города, села)
+CREATE TABLE "cities" (
+    city_id smallint UNIQUE NOT NULL,
+    subject_id smallint NOT NULL,
+    country_id smallint NOT NULL,
+    name varchar(64) NOT NULL,
+    PRIMARY KEY (city_id),
+    FOREIGN KEY (subject_id) REFERENCES subjects (subject_id) ON DELETE CASCADE,
+    FOREIGN KEY (country_id) REFERENCES countries (country_id) ON DELETE CASCADE
+);

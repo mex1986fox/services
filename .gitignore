@@ -1,3 +1,5 @@
 user/vendor
 token/vendor
+dependencies/vendor
+asynchreq/logs
 

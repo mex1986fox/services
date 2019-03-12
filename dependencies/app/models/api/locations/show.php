@@ -20,12 +20,15 @@ class Show
             $db = $this->container['db'];
             $q = "select * from countries;";
             $countries = $db->query($q, \PDO::FETCH_ASSOC)->fetchAll();
+            $q = "select * from subjects;";
+            $subjects = $db->query($q, \PDO::FETCH_ASSOC)->fetchAll();
             $q = "select * from cities;";
             $cities = $db->query($q, \PDO::FETCH_ASSOC)->fetchAll();
 
             return ["status" => "ok",
                 "data" => [
                     "countries" => $countries,
+                    "subjects" => $subjects,
                     "cities" => $cities,
                 ],
             ];

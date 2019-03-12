@@ -16,5 +16,6 @@ return [
         "token" => ["sheme" => "http", "host" => "token.ru", "port" => 8081],
         "asynchreq" => ["sheme" => "http", "host" => "asynchreq.ru", "port" => 8083],
         "user" => ["sheme" => "http", "host" => "user.ru", "port" => 8082],
+        "dependencies" => ["sheme" => "http", "host" => "dependencies.ru", "port" => 8084],
     ],
 ];
