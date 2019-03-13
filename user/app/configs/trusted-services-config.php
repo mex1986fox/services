@@ -6,6 +6,7 @@ return [
     "paths" => [
         "/api/token/delete",
         "/api/token/update",
+        "/api/dependencies/update",
         // "/api/token/authorizate"
     ],
 ];

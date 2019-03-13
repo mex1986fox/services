@@ -26,7 +26,7 @@ class Show
 
             // пишем в базу
             $db = $this->container['db'];
-            $q = "select id, login, name, surname, birthdate, settlement_id, phone, email from users " . $qWhere;
+            $q = "select id, login, name, surname, birthdate, city_id, phone, email from users " . $qWhere;
             $users = $db->query($q, \PDO::FETCH_ASSOC)->fetchAll();
 
             return ["status" => "ok",
