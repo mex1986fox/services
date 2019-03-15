@@ -26,9 +26,7 @@ require '../app/dependences/app-dependences.php';
 
 //добавляет зависимости к главному контроллеру
 $app->add(new DepController($container));
-
-$configTrustenServices = include '../app/configs/trusted-services-config.php';
-$app->add(new TrustedServices($configTrustenServices));
+$app->add(new TrustedServices($container));
 $app->map(['GET', 'POST'], '/api/{controller}/{action}',
     function (Request $request, Response $response, $args) {
         $nameController = 'App\\Controllers\\Api\\' . ucfirst($args['controller'] . 'Controller');

@@ -1,21 +1,21 @@
 <?php
 namespace App\Services\ApiRequests;
 
-class RequestShowLocations
+class RequestToDependencies
 {
     protected $container;
     public function __construct($container)
     {
         $this->container = $container;
     }
-    public function go()
+    public function go(string $url)
     {
 
         $sDepend = $this->container["services"]["dependencies"];
         //$jsonDataEncoded = json_encode($params);
         $ch = curl_init();
         // echo $sDepend["sheme"] . "://" . $sDepend["host"] . ":" . $sDepend["port"] . "/api/locations/show";
-        curl_setopt($ch, CURLOPT_URL, $sDepend["sheme"] . "://" . $sDepend["host"] . ":" . $sDepend["port"] . "/api/locations/show");
+        curl_setopt($ch, CURLOPT_URL, $sDepend["sheme"] . "://" . $sDepend["host"] . ":" . $sDepend["port"] . $url);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         //curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDataEncoded);

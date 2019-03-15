@@ -16,7 +16,7 @@ CREATE table "countries" (
 CREATE TABLE "subjects" (
     subject_id serial,
     country_id integer NOT NULL,
-    subject_number smallint NOT NULL,
+    subject_number INTEGER NOT NULL,
     name varchar(64) NOT NULL,
     name_general varchar(64) NOT NULL,
     name_url varchar(32) NOT NULL,

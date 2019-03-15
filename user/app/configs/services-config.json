@@ -1,0 +1,1 @@
+{"dependencies":{"sheme":"http","host":"dependencies.ru","port":8084,"ip":"127.0.0.1"},"token":{"sheme":"http","host":"token.ru","port":8081,"ip":"127.0.0.1"},"asynchreq":{"sheme":"http","host":"asynchreq.ru","port":8083,"ip":"127.0.0.1"},"user":{"sheme":"http","host":"user.ru","port":8082,"ip":"127.0.0.1"}}

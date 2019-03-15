@@ -1,5 +1,10 @@
 <?php
-
+//добавляем в контейнер список сервисов
+$container['services'] = function ($c) {
+    $fileJson = file_get_contents('../app/configs/services-config.json');
+    $services = $taskList = json_decode($fileJson, true);
+    return $services;
+};
 //добавляем в контейнер зависимостей PDO
 $container['db'] = function ($c) {
     $db = $c['settings']['db'];

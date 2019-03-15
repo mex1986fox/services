@@ -12,9 +12,10 @@ return [
             'dbname' => "dependencies",
         ],
     ],
-    "services" => [
-        "token" => ["sheme" => "http", "host" => "token.ru", "port" => 8081],
-        "asynchreq" => ["sheme" => "http", "host" => "asynchreq.ru", "port" => 8083],
-        "user" => ["sheme" => "http", "host" => "user.ru", "port" => 8082],
+    "closed_records" => [
+        "paths" => [
+            "/api/services/show"
+        ],
     ],
+
 ];

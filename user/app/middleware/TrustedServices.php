@@ -10,16 +10,21 @@ namespace App\Middleware;
 
 class TrustedServices
 {
-    protected $trusted_services;
-    public function __construct($trusted_services)
+    protected $container;
+    protected $path;
+    protected $services;
+    public function __construct($container)
     {
-        $this->trusted_services = $trusted_services;
+        $this->container = $container;
+        $this->path = $container["closed_records"]['paths'];
+        $this->services =$container["services"];  
+
     }
     public function __invoke($request, $response, $next)
     {
         //проверяем стоит ли для данного маршрута использовать проверку
         $checkFlag = false;
-        foreach ($this->trusted_services['paths'] as $key => $path) {
+        foreach ($this->path as $key => $path) {
             if (stripos($request->getUri()->getPath(), $path) !== false) {
                 $checkFlag = true;
             }
@@ -27,8 +32,8 @@ class TrustedServices
 
         if ($checkFlag == true) {
             //проверяем входит ли в группу доверенных адресов
-            foreach ($this->trusted_services['ip'] as $key => $ip) {
-                if ($_SERVER['REMOTE_ADDR'] == $ip) {
+            foreach ($this->services as $key => $serv) {
+                if ($_SERVER['REMOTE_ADDR'] == $serv["ip"]) {
                     // если входит тогда прокидываем запрос дальше
                     return $next($request, $response);
                 }

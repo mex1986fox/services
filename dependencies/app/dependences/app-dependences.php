@@ -1,5 +1,11 @@
 <?php
 
+//добавляем в контейнер список сервисов
+$container['services'] = function ($c) {
+    $fileJson = file_get_contents('../app/configs/services-config.json');
+    $services = $taskList = json_decode($fileJson, true);
+    return $services;
+};
 //добавляем в контейнер зависимостей PDO
 $container['db'] = function ($c) {
     $db = $c['settings']['db'];
@@ -28,7 +34,7 @@ $container['validators'] = function ($c) {
     $validators = new \App\Services\Validator\ValidatorFactory($c);
     return $validators;
 };
-//добавляем в контейнер сервисы авторизации
+//добавляем в контейнер запросы к сервисвисам
 $container['api-requests'] = function ($c) {
     $request = new \App\Services\ApiRequests\FactoryApiRequest($c);
     return $request;
