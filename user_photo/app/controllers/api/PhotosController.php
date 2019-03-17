@@ -2,12 +2,12 @@
 namespace App\Controllers\Api;
 
 use \App\Controllers\MainController;
-use \App\Models\Api\User\Create as Create;
-use \App\Models\Api\User\Delete as Delete;
-use \App\Models\Api\User\Show as Show;
-use \App\Models\Api\User\Update as Update;
+use \App\Models\Api\Photos\Create as Create;
+use \App\Models\Api\Photos\Delete as Delete;
+use \App\Models\Api\Photos\Show as Show;
+use \App\Models\Api\Photos\Update as Update;
 
-class UserController extends MainController
+class PhotosController extends MainController
 {
     public function create($request, $response, $args)
     {

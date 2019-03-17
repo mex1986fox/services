@@ -15,7 +15,8 @@ require '../vendor/autoload.php';
 
 //подключаем файл с конфигурацией
 $config = include '../app/configs/app-config.php';
-
+//подключаем констаты
+require '../app/configs/global-consts.php';
 //создаем приложение и скармливаем ему конфигурацию
 $app = new \Slim\App($config);
 

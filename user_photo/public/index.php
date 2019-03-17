@@ -1,8 +1,8 @@
 <?php
 session_start(); //стартуем сессию для всех запросов
 use \App\Middleware\DepController;
-use \App\Middleware\TrustedServices;
 use \App\Middleware\StandardFiltering;
+use \App\Middleware\TrustedServices;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -15,7 +15,8 @@ require '../vendor/autoload.php';
 
 //подключаем файл с конфигурацией
 $config = include '../app/configs/app-config.php';
-
+//подключаем констаты
+require '../app/configs/global-consts.php';
 //создаем приложение и скармливаем ему конфигурацию
 $app = new \Slim\App($config);
 
@@ -27,7 +28,7 @@ require '../app/dependences/app-dependences.php';
 //добавляет зависимости к главному контроллеру
 $app->add(new DepController($container));
 $app->add(new TrustedServices($container));
-$app->map(['GET', 'POST'],'/api/{controller}/{action}',
+$app->map(['GET', 'POST'], '/api/{controller}/{action}',
     function (Request $request, Response $response, $args) {
         $nameController = 'App\\Controllers\\Api\\' . ucfirst($args['controller'] . 'Controller');
         $nameAction = $args['action'];
@@ -46,7 +47,7 @@ $app->map(['GET', 'POST'],'/api/{controller}/{action}',
 //         return $response;
 //     }
 
-// )->add(new StandardFiltering($container));                
+// )->add(new StandardFiltering($container));
 // $app->get('/authorization', \App\Controllers\App\AuthorizationController::class . ":authorization")->add(new StandardFiltering($container));
 // $app->get('/account/data', \App\Controllers\App\AccountDataController::class . ":show")->add(new StandardFiltering($container));
 

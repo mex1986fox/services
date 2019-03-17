@@ -33,6 +33,12 @@ $container['validators'] = function ($c) {
     $validators = new \App\Services\Validator\ValidatorFactory($c);
     return $validators;
 };
+//добавляем в контейнер зависимостей
+//конвертеры, преобразователи,
+$container['converters'] = function ($c) {
+    $converters = new \App\Services\Converter\ConverterFactory($c);
+    return $converters;
+};
 //добавляем в контейнер сервисы авторизации
 $container['api-requests'] = function ($c) {
     $request = new \App\Services\ApiRequests\FactoryApiRequest($c);
