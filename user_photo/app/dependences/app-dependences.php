@@ -39,8 +39,13 @@ $container['converters'] = function ($c) {
     $converters = new \App\Services\Converter\ConverterFactory($c);
     return $converters;
 };
-//добавляем в контейнер сервисы авторизации
+//добавляем в контейнер запросы к сервисам
 $container['api-requests'] = function ($c) {
     $request = new \App\Services\ApiRequests\FactoryApiRequest($c);
+    return $request;
+};
+//добавляем в контейнер запросы к базе
+$container['db-requests'] = function ($c) {
+    $request = new \App\Services\DbRequests\FactoryDbRequest($c);
     return $request;
 };
