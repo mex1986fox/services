@@ -1,5 +1,6 @@
 <?php
 session_start(); //стартуем сессию для всех запросов
+use \App\Middleware\CORSResponse;
 use \App\Middleware\DepController;
 use \App\Middleware\StandardFiltering;
 use \App\Middleware\TrustedServices;
@@ -37,7 +38,8 @@ $app->map(['GET', 'POST'], '/api/{controller}/{action}',
         return $response;
     }
 
-)->add(new StandardFiltering($container));
+)->add(new StandardFiltering($container))
+    ->add(new CORSResponse($container));
 // $app->get('/api/{controller}/{action}',
 //     function (Request $request, Response $response, $args) {
 //         $nameController = 'App\\Controllers\\Api\\' . ucfirst($args['controller'] . 'Controller');
