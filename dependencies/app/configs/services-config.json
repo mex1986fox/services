@@ -22,5 +22,17 @@
         "host": "user.ru",
         "port": 8082,
         "ip":"127.0.0.1"
+    },
+    "userphoto": {
+        "sheme": "http",
+        "host": "userphoto.ru",
+        "port": 8085,
+        "ip":"127.0.0.1"
+    },
+    "captcha": {
+        "sheme": "http",
+        "host": "captcha.ru",
+        "port": 8086,
+        "ip":"127.0.0.1"
     }
 }
