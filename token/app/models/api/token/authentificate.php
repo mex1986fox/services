@@ -68,10 +68,10 @@ class Authentificate
             }
 
             // создаем токены доступа
-            $accessToken = new TokenStructur();
+            $accessToken = new TokenStructur($this->container);
             $accessToken->initAccessToken($user["user_id"]);
 
-            $refreshToken = new TokenStructur();
+            $refreshToken = new TokenStructur($this->container);
             $refreshToken->initRefreshToken($user["user_id"]);
 
             $q = "update tokens
@@ -85,9 +85,9 @@ class Authentificate
                 throw new \Exception("Запись в базу не удалась.");
             }
             // отправить запросы на обновление токенов у микросервисов
-            $apiReqwests = $this->container['api-requests'];
-            $rCreateToken = $apiReqwests->RequestUpdateTokens;
-            $rCreateToken->go(["user_id" => $user["user_id"], "access_token" => $accessToken->getToken()]);
+            // $apiReqwests = $this->container['api-requests'];
+            // $rCreateToken = $apiReqwests->RequestUpdateTokens;
+            // $rCreateToken->go(["user_id" => $user["user_id"], "access_token" => $accessToken->getToken()]);
 
             return ["status" => "ok",
                 "data" => [

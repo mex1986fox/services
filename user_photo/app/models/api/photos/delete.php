@@ -34,12 +34,14 @@ class Delete
             }
             $files = $p["name_files"];
             $accessToken = $p["access_token"];
-            $tokenStructur = new TokenStructur();
+            $tokenStructur = new TokenStructur($this->container);
             $tokenStructur->setToken($accessToken);
 
             // проверяем параметры
             $valid = $this->container['validators'];
+            $tokenSKey=$this->container['services']['token']['key_access_token'];
             $vToken = $valid->TokenValidator;
+            $vToken->setKey($tokenSKey);
             if (!$vToken->isValid($tokenStructur)) {
                 $exceptions["access_token"] = "Не действителен.";
                 throw new \Exception("Ошибки в параметрах.");

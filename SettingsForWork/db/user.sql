@@ -9,6 +9,7 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO "suser";
 CREATE TABLE "users" (
     id bigserial,
     login varchar(64) NOT NULL UNIQUE,
+    password varchar(32) NOT NULL,
     name varchar(64),
     surname varchar(64),
     birthdate date,
@@ -16,12 +17,6 @@ CREATE TABLE "users" (
     phone varchar(20),
     email varchar(256),
     PRIMARY KEY (id)
-);
-
--- таблица токенов для аутентификации
-CREATE TABLE "tokens" (
-    user_id bigint UNIQUE NOT NULL,
-    access_tokens jsonb
 );
 
 -- страны

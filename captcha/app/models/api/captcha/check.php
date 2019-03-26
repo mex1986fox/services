@@ -24,12 +24,7 @@ class Check
                 $exceptions["token"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
             }
-            if (empty($p["answer"])) {
-                $exceptions["answer"] = "Не указан.";
-                throw new \Exception("Ошибки в параметрах.");
-            }
             //формируем токен
-            $answer = $p["answer"];
             $token = $p["token"];
             $tokenStructur = new CaptchaTokenStructur();
             $tokenStructur->setToken($token);
@@ -59,25 +54,25 @@ class Check
                 throw new \Exception("Ошибки в параметрах.");
             }
             //проверяем в базе
-            $q = "select answer from captcha where captcha_id=" . $tokenStructur->getCaptchaID();
+            $q = "select status from captcha where captcha_id=" . $tokenStructur->getCaptchaID();
             $tokenDB = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-            if (empty($tokenDB["answer"])) {
-                $exceptions["answer"] = "Отсутствует в базе.";
+            if (empty($tokenDB["status"])) {
+                $exceptions["status"] = "Отсутствует в базе.";
                 throw new \Exception("Ошибки в параметрах.");
             }
 
             // если не верный ответ 
             // удаляем ответ из базы и статус ставим в false
-            if ($tokenDB["answer"] != md5($answer)) {
-                $q = "update captcha set answer='', status = false where captcha_id=" . $tokenStructur->getCaptchaID();
+            if ($tokenDB["status"] != true) {
+                $q = "delete from captcha where captcha_id=" . $tokenStructur->getCaptchaID();
                 $tokenDB = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-                $exceptions["answer"] = "Не верный.";
+                $exceptions["status"] = "Не прошел каптчу";
                 throw new \Exception("Ошибки в параметрах.");
 
             }
             // если верный ответ 
             // удаляем ответ из базы и статус ставим в true
-            $q = "update captcha set answer='', status = true where captcha_id=" . $tokenStructur->getCaptchaID();
+            $q = "delete from captcha where captcha_id=" . $tokenStructur->getCaptchaID();
                 $tokenDB = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
 
             return ["status" => "ok",

@@ -29,7 +29,7 @@ class Update
                 $exceptions["refresh_token"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
             }
-            $token = new TokenStructur();
+            $token = new TokenStructur($this->container);
             $token->setToken($refreshToken);
             //ищем ключ от токена
             $db = $this->container['db'];
@@ -58,10 +58,10 @@ class Update
             }
 
             // создаем токены доступа
-            $accessToken = new TokenStructur();
+            $accessToken = new TokenStructur($this->container);
             $accessToken->initAccessToken($user["user_id"]);
 
-            $refreshToken = new TokenStructur();
+            $refreshToken = new TokenStructur($this->container);
             $refreshToken->initRefreshToken($user["user_id"]);
 
             $q = "update tokens
@@ -76,9 +76,9 @@ class Update
             }
            
             // отправить запросы на обновление токенов у микросервисов
-            $apiReqwests = $this->container['api-requests'];
-            $rCreateToken = $apiReqwests->RequestUpdateTokens;
-            $rCreateToken->go(["user_id" => $token->getUserID(), "access_token"=>$accessToken->getToken()]);
+            // $apiReqwests = $this->container['api-requests'];
+            // $rCreateToken = $apiReqwests->RequestUpdateTokens;
+            // $rCreateToken->go(["user_id" => $token->getUserID(), "access_token"=>$accessToken->getToken()]);
 
 
             return ["status" => "ok",

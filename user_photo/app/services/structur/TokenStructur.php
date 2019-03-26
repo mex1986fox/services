@@ -9,7 +9,11 @@ class TokenStructur
     protected $tokenHeader;
     protected $tokenHP;
     protected $tokenSecretKey;
-
+    protected $container;
+    public function __construct($container)
+    {
+        $this->container = $container;
+    }
     public function setToken(string $tStructure)
     {
         $this->token = $tStructure;
@@ -56,11 +60,10 @@ class TokenStructur
         $TokenExp = (time() + (30 * 60)); //время смерти токена после которого он не актуален
         $TokenPayload = '{"userID": ' . $userId . ',"iat": ' . $TokenIat . ', "exp":' . $TokenExp . '}';
         $TokenHPEncode = base64_encode($TokenHeader) . "." . base64_encode($TokenPayload);
-        $ivlen = openssl_cipher_iv_length('AES256');
-        $TokenSecretKey = openssl_random_pseudo_bytes($ivlen);
+        $TokenSecretKeyHex = $this->container["services"]["token"]["key_access_token"];
+        $TokenSecretKey = hex2bin($TokenSecretKeyHex);
         $TokenSignature = openssl_encrypt($TokenHPEncode, 'AES256', $TokenSecretKey, 0, $TokenSecretKey);
         $Token = $TokenHPEncode . "." . $TokenSignature;
-        $TokenSecretKeyHex = bin2hex($TokenSecretKey);
         $this->token = $Token;
         $this->tokenSignature = $TokenSignature;
         $this->tokenHP = $TokenHPEncode;
@@ -80,17 +83,17 @@ class TokenStructur
         $TokenExp = (time() + (30 * 24 * 60 * 60)); //время смерти токена после которого он не актуален
         $TokenPayload = '{"userID": ' . $userId . ',"iat": ' . $TokenIat . ', "exp":' . $TokenExp . '}';
         $TokenHPEncode = base64_encode($TokenHeader) . "." . base64_encode($TokenPayload);
-        $ivlen = openssl_cipher_iv_length('AES256');
-        $TokenSecretKey = openssl_random_pseudo_bytes($ivlen);
+        $TokenSecretKeyHex = $this->container["services"]["token"]["key_refresh_token"];
+        $TokenSecretKey = hex2bin($TokenSecretKeyHex);
         $TokenSignature = openssl_encrypt($TokenHPEncode, 'AES256', $TokenSecretKey, 0, $TokenSecretKey);
         $Token = $TokenHPEncode . "." . $TokenSignature;
-        $TokenSecretKeyHex = bin2hex($TokenSecretKey);
+        
         $this->token = $Token;
         $this->tokenSignature = $TokenSignature;
         $this->tokenHP = $TokenHPEncode;
         $this->tokenPayload = json_decode($TokenPayload);
         $this->tokenHeader = json_decode($TokenHeader);
-        $this->tokenSecretKey = $TokenSecretKeyHex;
+        $this->tokenSecretKey =$TokenSecretKeyHex;
 
     }
     public function getToken()

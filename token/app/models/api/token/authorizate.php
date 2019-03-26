@@ -29,7 +29,7 @@ class Authorizate
                 throw new \Exception("Ошибки в параметрах.");
             }
             $accessToken = $p["access_token"];
-            $token = new TokenStructur();
+            $token = new TokenStructur($this->container);
             $token->setToken($accessToken);
             //ищем ключ от токена
             $db = $this->container['db'];

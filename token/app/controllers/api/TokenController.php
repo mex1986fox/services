@@ -27,23 +27,24 @@ class TokenController extends MainController
         return $response;
 
     }
-    public function authorizate($request, $response, $args)
-    {
-        $cont = $this->container;
-        $reg = new Authorizate($cont, $request, $response);
-        $answer = $reg->run();
-        if ($answer['status'] == "ok") {
-            $response = $response->withJson($answer, 200);
-        }
-        if ($answer['status'] == "except") {
-            $response = $response->withJson($answer, 400);
-        }
-        if ($answer['status'] == "error") {
-            $response = $response->withJson($answer, 404);
-        }
-        return $response;
+    // закрыл авторизаци т.к. это проверка включено в токен
+    // public function authorizate($request, $response, $args)
+    // {
+    //     $cont = $this->container;
+    //     $reg = new Authorizate($cont, $request, $response);
+    //     $answer = $reg->run();
+    //     if ($answer['status'] == "ok") {
+    //         $response = $response->withJson($answer, 200);
+    //     }
+    //     if ($answer['status'] == "except") {
+    //         $response = $response->withJson($answer, 400);
+    //     }
+    //     if ($answer['status'] == "error") {
+    //         $response = $response->withJson($answer, 404);
+    //     }
+    //     return $response;
 
-    }
+    // }
     public function authentificate($request, $response, $args)
     {
         $cont = $this->container;

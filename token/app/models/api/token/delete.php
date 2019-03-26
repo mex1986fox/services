@@ -30,7 +30,7 @@ class Delete
                 $exceptions["access_token"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
             }
-            $token = new TokenStructur();
+            $token = new TokenStructur($this->container);
             $token->setToken($accessToken);
             //ищем ключ от токена
             $db = $this->container['db'];
@@ -71,13 +71,13 @@ class Delete
                 throw new \Exception("Запись в базу не удалась.");
             }
             // отправить запросы на удаление токенов у микросервисов
-            $apiReqwests = $this->container['api-requests'];
-            $rCreateToken = $apiReqwests->RequestDeleteTokens;
-            $statusDeleteTokens = $rCreateToken->go(["user_id" => $token->getUserID()]);
+            // $apiReqwests = $this->container['api-requests'];
+            // $rCreateToken = $apiReqwests->RequestDeleteTokens;
+            // $statusDeleteTokens = $rCreateToken->go(["user_id" => $token->getUserID()]);
             // если не удалось отправить запросы на удаление токенов у микросервисов
-            if ($statusDeleteTokens == false) {
-                throw new \Exception("На сервисах удаление не удалось.");
-            }
+            // if ($statusDeleteTokens == false) {
+            //     throw new \Exception("На сервисах удаление не удалось.");
+            // }
             return [
                 "status" => "ok",
                 "data" => null,

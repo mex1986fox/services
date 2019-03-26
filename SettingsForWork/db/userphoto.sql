@@ -37,8 +37,3 @@ create table "photos"(
 --     }
 -- }
 
--- таблица токенов для аутентификации
-CREATE TABLE "tokens" (
-    user_id bigint UNIQUE NOT NULL,
-    access_tokens jsonb
-);

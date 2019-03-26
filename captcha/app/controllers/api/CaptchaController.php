@@ -5,7 +5,7 @@ use \App\Controllers\MainController;
 use \App\Models\Api\Captcha\Create as Create;
 use \App\Models\Api\Captcha\Show as Show;
 use \App\Models\Api\Captcha\Confirm as Confirm;
-// use \App\Models\Api\Captcha\Update as Update;
+use \App\Models\Api\Captcha\Check as Check;
 
 class CaptchaController extends MainController
 {
@@ -33,9 +33,10 @@ class CaptchaController extends MainController
         $reg = new Show($cont, $request, $response);
         $answer = $reg->run();
         if ($answer['status'] == "ok") {
-            $response = $response->withHeader('Content-type', "image/png");
-            imagepng($answer["data"]["captcha"]);
-            imagedestroy($answer["data"]["captcha"]);
+            // $response = $response->withHeader('Content-type', "image/png");
+            // imagepng($answer["data"]["captcha"]);
+            // imagedestroy($answer["data"]["captcha"]);
+            $response = $response->withJson($answer, 200);
         }
         if ($answer['status'] == "except") {
             $response = $response->withJson($answer, 400);
@@ -50,6 +51,22 @@ class CaptchaController extends MainController
     {
         $cont = $this->container;
         $reg = new Confirm($cont, $request, $response);
+        $answer = $reg->run();
+        if ($answer['status'] == "ok") {
+            $response = $response->withJson($answer, 200);
+        }
+        if ($answer['status'] == "except") {
+            $response = $response->withJson($answer, 400);
+        }
+        if ($answer['status'] == "error") {
+            $response = $response->withJson($answer, 404);
+        }
+        return $response;
+    }
+    public function check($request, $response, $args)
+    {
+        $cont = $this->container;
+        $reg = new Check($cont, $request, $response);
         $answer = $reg->run();
         if ($answer['status'] == "ok") {
             $response = $response->withJson($answer, 200);
