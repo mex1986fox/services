@@ -8,7 +8,7 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO "suser";
 
 -- таблица токенов для сервеса аутентификации
 CREATE TABLE "tokens" (
-    user_id bigint NOT NULL,
+    user_id bigint NOT NULL UNIQUE,
     access_tokens jsonb DEFAULT '{}',
     refresh_tokens jsonb DEFAULT '{}',
     PRIMARY KEY (user_id)

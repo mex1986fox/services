@@ -27,7 +27,7 @@ class Show
 
             //формируем токен
             $token = $p["token"];
-            $tokenStructur = new CaptchaTokenStructur();
+            $tokenStructur = new CaptchaTokenStructur($this->container);
             $tokenStructur->setToken($token);
 
             //ищем ключ от токена

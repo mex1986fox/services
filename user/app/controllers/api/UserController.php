@@ -2,8 +2,8 @@
 namespace App\Controllers\Api;
 
 use \App\Controllers\MainController;
+use \App\Models\Api\User\Authentificate as Authentificate;
 use \App\Models\Api\User\Create as Create;
-use \App\Models\Api\User\Delete as Delete;
 use \App\Models\Api\User\Show as Show;
 use \App\Models\Api\User\Update as Update;
 
@@ -59,10 +59,10 @@ class UserController extends MainController
         }
         return $response;
     }
-    public function delete($request, $response, $args)
+    public function authentificate($request, $response, $args)
     {
         $cont = $this->container;
-        $reg = new Delete($cont, $request, $response);
+        $reg = new Authentificate($cont, $request, $response);
         $answer = $reg->run();
         if ($answer['status'] == "ok") {
             $response = $response->withJson($answer, 200);
@@ -75,4 +75,5 @@ class UserController extends MainController
         }
         return $response;
     }
+
 }

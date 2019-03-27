@@ -7,7 +7,7 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO "suser";
 
 -- таблица пользователей
 CREATE TABLE "users" (
-    id bigserial,
+    user_id bigserial,
     login varchar(64) NOT NULL UNIQUE,
     password varchar(32) NOT NULL,
     name varchar(64),
@@ -16,7 +16,7 @@ CREATE TABLE "users" (
     city_id INTEGER,
     phone varchar(20),
     email varchar(256),
-    PRIMARY KEY (id)
+    PRIMARY KEY (user_id)
 );
 
 -- страны

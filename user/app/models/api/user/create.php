@@ -1,6 +1,8 @@
 <?php
 namespace App\Models\Api\User;
 
+use \App\Services\Structur\CaptchaTokenStructur;
+
 class Create
 {
     protected $request, $response, $container;
@@ -15,23 +17,28 @@ class Create
     {
         // создает новых юзеров
         try {
-            // передаем параметры в переменные
             $p = $this->request->getQueryParams();
             $exceptions = [];
+            // проверяем параметры
+            $valid = $this->container['validators'];
+            $vStLen = $valid->StringLength;
             if (empty($p["login"])) {
                 $exceptions["login"] = "Не указан.";
             }
             if (empty($p["password"])) {
                 $exceptions["password"] = "Не указан.";
             }
+            if (empty($p["captcha_token"])) {
+                $exceptions["captcha_token"] = "Не указан.";
+            }
             if (!empty($exceptions)) {
                 throw new \Exception("Ошибки в параметрах.");
             }
+
             $login = $p["login"];
             $password = $p["password"];
-            // проверяем параметры
-            $valid = $this->container['validators'];
-            $vStLen = $valid->StringLength;
+            $tokenCaptcha = $p["captcha_token"];
+
             $vStLen->setMin(1);
             $vStLen->setMax(64);
             if (!$vStLen->isValid($login)) {
@@ -42,34 +49,37 @@ class Create
             if (!$vStLen->isValid($password)) {
                 $exceptions["password"] = "Не соответсвует диапозону длины.";
             }
-            if (!empty($exceptions)) {
+            //проверить токин
+            //формируем токен
+
+            $tokenStructur = new CaptchaTokenStructur($this->container);
+            $tokenStructur->setToken($tokenCaptcha);
+            $vToken = $valid->TokenCaptchaValidator;
+            $TokenKey = $this->container["services"]["token"]["key_captcha_token"];
+            $vToken->setKey($TokenKey);
+            if (!$vToken->isValid($tokenStructur)) {
+                $exceptions["token"] = "Не действителен.";
                 throw new \Exception("Ошибки в параметрах.");
             }
 
+            if (!empty($exceptions)) {
+                throw new \Exception("Ошибки в параметрах.");
+            }
+            // проверяем наличие в базе
+
             // пишем в базу
             $db = $this->container['db'];
-            $q =
-                "insert into users (login) values ('{$login}') returning *;";
+            $q = "insert into users
+                    (login, password )
+                values
+                    ('{$login}',md5('{$password}'))
+                returning user_id;";
             $sth = $db->query($q, \PDO::FETCH_ASSOC);
             $user = $sth->fetch();
 
-            if (!isset($user["id"])) {
+            if (!isset($user["user_id"])) {
                 throw new \Exception("Запись в базу не удалась.");
             }
-            // посылаем запрос к микросервису токенов
-            // для создания токена для юзера
-            $apiReqwests = $this->container['api-requests'];
-            $rToken = $apiReqwests->RequestToToken;
-            $statusCreateToken = $rToken->go("/api/token/create",["user_id" => $user["id"], "login" => $login, "password" => $password]);
-            // если не удалось создать токен
-            if ($statusCreateToken == false) {
-
-                $q = "delete from users * where id={$user["id"]}";
-                $sth = $db->query($q, \PDO::FETCH_ASSOC);
-                $user = $sth->fetch();
-                throw new \Exception("Токен не создан.");
-            }
-            // отправить всем сервисам запросы на удаление токенов
             return ["status" => "ok",
                 "data" => null,
             ];

@@ -41,9 +41,6 @@ class CaptchaTokenStructur
         if (!isset($this->tokenPayload->captchaID)) {
             throw new \Exception("Не указан id номер каптчи.", 1);
         }
-        if (!isset($this->tokenPayload->status)) {
-            throw new \Exception("Не указан статус каптчи.", 1);
-        }
         if (!isset($this->tokenPayload->exp)) {
             throw new \Exception("Не указан срок действия каптчи.", 1);
         }
@@ -52,7 +49,7 @@ class CaptchaTokenStructur
         }
 
     }
-    public function initToken($captchaId, $status)
+    public function initToken($captchaId)
     {
         // создаем токены доступа
         // alg - алгоритм шифрования
@@ -61,7 +58,7 @@ class CaptchaTokenStructur
         $TokenHeader = '{"alg":"AES256","typ":"JWT"}';
         $TokenIat = time(); //время создания каптчи
         $TokenExp = (time() + (3 * 60)); //время смерти каптчи после которого он не актуален
-        $TokenPayload = '{"captchaID": ' . $captchaId . ',"status": ' . $status. ',"iat": ' . $TokenIat . ', "exp":' . $TokenExp . '}';
+        $TokenPayload = '{"captchaID": ' . $captchaId . ',"iat": ' . $TokenIat . ', "exp":' . $TokenExp . '}';
         $TokenHPEncode = base64_encode($TokenHeader) . "." . base64_encode($TokenPayload);
         $TokenSecretKeyHex = $this->container["services"]["token"]["key_captcha_token"];
         $TokenSecretKey = hex2bin($TokenSecretKeyHex);
@@ -119,6 +116,7 @@ class CaptchaTokenStructur
     {
         return $this->tokenPayload->status;
     }
+    
     public function getSecretKey()
     {
         if (isset($this->tokenSecretKey)) {

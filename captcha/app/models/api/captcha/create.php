@@ -25,8 +25,8 @@ class Create
             
             //формируем токен для базы
             $captchaId = $tokenDB["captcha_id"];
-            $tokenStructur = new CaptchaTokenStructur();
-            $tokenStructur->initToken($captchaId);
+            $tokenStructur = new CaptchaTokenStructur($this->container);
+            $tokenStructur->initToken($captchaId, "false");
 
             // формируем каптчу
 

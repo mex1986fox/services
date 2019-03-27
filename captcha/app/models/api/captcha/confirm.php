@@ -31,7 +31,7 @@ class Confirm
             //формируем токен
             $answer = $p["answer"];
             $token = $p["token"];
-            $tokenStructur = new CaptchaTokenStructur();
+            $tokenStructur = new CaptchaTokenStructur($this->container);
             $tokenStructur->setToken($token);
 
             //ищем ключ от токена
@@ -79,8 +79,14 @@ class Confirm
             $q = "update captcha set answer='', status = true where captcha_id=" . $tokenStructur->getCaptchaID();
             $tokenDB = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
 
+            //формируем токен для ответа со статусом пройдено
+            $tokenStructurAns = new CaptchaTokenStructur($this->container);
+            $tokenStructurAns->initToken($tokenStructur->getCaptchaID(), "true");
+
             return ["status" => "ok",
-                "data" => null,
+                "data" => [
+                    "token"=>$tokenStructurAns->getToken()
+                ],
             ];
         } catch (RuntimeException | \Exception $e) {
 
