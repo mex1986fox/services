@@ -20,10 +20,14 @@ class Update
 
             // передаем параметры в переменные
             $p = $this->request->getQueryParams();
+
             $exceptions = [];
             if (empty($p["access_token"])) {
                 $exceptions["access_token"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
+            }
+            if (count($p) <= 1) {
+                throw new \Exception("Запрос пустой не имеет параметров.");
             }
 
             $accessToken = $p["access_token"];
@@ -32,7 +36,7 @@ class Update
 
             // проверяем параметры
             $valid = $this->container['validators'];
-            $tokenSKey=$this->container['services']['token']['key_access_token'];
+            $tokenSKey = $this->container['services']['token']['key_access_token'];
             $vToken = $valid->TokenValidator;
             $vToken->setKey($tokenSKey);
             if (!$vToken->isValid($tokenStructur)) {
@@ -93,15 +97,15 @@ class Update
             $qSet = $qSet . (empty($p["phone"]) ? "" : " phone='{$p["phone"]}',");
             $qSet = $qSet . (empty($p["email"]) ? "" : " email='{$p["email"]}',");
             $qSet = (empty($qSet) ? "" : substr($qSet, 0, -1));
-            if (!empty($qSet)) {
-                $q = "update users set {$qSet} where id={$tokenStructur->getUserID()} RETURNING *;";
-                $db = $this->container['db'];
-                $user = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-            }
 
+            $q = "update users set {$qSet} where user_id={$tokenStructur->getUserID()} RETURNING *;";
+            $db = $this->container['db'];
+            $user = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            unset($user['password']);
             return ["status" => "ok",
-                "data" => null,
+                "data" => ["user" => $user],
             ];
+
         } catch (RuntimeException | \Exception $e) {
             $exceptions["massege"] = $e->getMessage();
             return [

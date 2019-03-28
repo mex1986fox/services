@@ -41,9 +41,12 @@ class Update
             }
             $TokenKey = current(json_decode($user["refresh_tokens"], 1));
             if (empty($TokenKey)) {
-                throw new \Exception("refresh_tokens отсутствует у пользователя.");
+                throw new \Exception("refresh_token отсутствует у пользователя.");
             }
-
+            $TokenSignature = key(json_decode($user["refresh_tokens"], 1));
+            if ($TokenSignature!=$token->getSignature()) {
+                throw new \Exception("Сигнатура refresh_token не зарегистрированна в системе.");
+            }
             // проверяем токен
             $valid = $this->container['validators'];
             $vToken = $valid->TokenValidator;
@@ -56,6 +59,7 @@ class Update
                 $exceptions["refresh_token"] = "Истекло время жизни токена.";
                 throw new \Exception("Ошибки в параметрах.");
             }
+
 
             // создаем токены доступа
             $accessToken = new TokenStructur($this->container);
