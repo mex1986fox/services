@@ -3,7 +3,7 @@ namespace App\Models\Api\Photos;
 
 use \App\Services\Structur\TokenStructur;
 
-class Create
+class Upload
 {
     protected $request, $response, $container;
     public function __construct($container, $request, $response)
@@ -46,6 +46,7 @@ class Create
                 $exceptions["access_token"] = "Не действителен.";
                 throw new \Exception("Ошибки в параметрах.");
             }
+
             $vLoadImg = $valid->ImgValidator;
             //вынимаем из токена id юзера
             $userID = $tokenStructur->getUserID();

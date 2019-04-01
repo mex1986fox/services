@@ -21,13 +21,13 @@ class Show
 
             // строим запрос
             $qWhere = "";
-            $qWhere = $qWhere . (empty($userID) ? "" : " id=" . $userID);
+            $qWhere = $qWhere . (empty($userID) ? "" : " user_id=" . $userID);
             $qWhere = (empty($qWhere) ? "" : " where ") . $qWhere;
 
             // пишем в базу
             $db = $this->container['db'];
             $q =
-                " select id, login, users.name, surname, birthdate, phone, email,".
+                " select user_id, login, users.name, surname, birthdate, phone, email,".
                 " cities.city_id, cities.name as city, subjects.subject_id, subjects.name as subject, " .
                 " countries.country_id, countries.name as country from users " .
                 " LEFT JOIN cities ON cities.city_id = users.city_id " .

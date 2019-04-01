@@ -2,17 +2,17 @@
 namespace App\Controllers\Api;
 
 use \App\Controllers\MainController;
-use \App\Models\Api\Photos\Create as Create;
+use \App\Models\Api\Photos\Upload as Upload;
 use \App\Models\Api\Photos\Delete as Delete;
 use \App\Models\Api\Photos\Show as Show;
 use \App\Models\Api\Photos\Update as Update;
 
-class PhotosController extends MainController
+class UserphotoController extends MainController
 {
-    public function create($request, $response, $args)
+    public function upload($request, $response, $args)
     {
         $cont = $this->container;
-        $reg = new Create($cont, $request, $response);
+        $reg = new Upload($cont, $request, $response);
         $answer = $reg->run();
         if ($answer['status'] == "ok") {
             $response = $response->withJson($answer, 200);

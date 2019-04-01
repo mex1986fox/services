@@ -40,21 +40,4 @@ $app->map(['GET', 'POST'], '/api/{controller}/{action}',
 
 )->add(new StandardFiltering($container))
     ->add(new CORSResponse($container));
-// $app->get('/api/{controller}/{action}',
-//     function (Request $request, Response $response, $args) {
-//         $nameController = 'App\\Controllers\\Api\\' . ucfirst($args['controller'] . 'Controller');
-//         $nameAction = $args['action'];
-//         $controller = new $nameController();
-//         $response = $controller->$nameAction($request, $response, $args);
-//         return $response;
-//     }
-
-// )->add(new StandardFiltering($container));
-// $app->get('/authorization', \App\Controllers\App\AuthorizationController::class . ":authorization")->add(new StandardFiltering($container));
-// $app->get('/account/data', \App\Controllers\App\AccountDataController::class . ":show")->add(new StandardFiltering($container));
-
-// $app->get('/ads', \App\Controllers\App\AdsController::class . ":show")->add(new StandardFiltering($container));
-// $app->get('/users', \App\Controllers\App\UsersController::class . ":show")->add(new StandardFiltering($container));
-// $app->get('/albums', \App\Controllers\App\AlbumsController::class . ":show")->add(new StandardFiltering($container));
-// $app->get('/posts', \App\Controllers\App\PostsController::class . ":show")->add(new StandardFiltering($container));
 $app->run();

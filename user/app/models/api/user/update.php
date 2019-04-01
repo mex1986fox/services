@@ -26,9 +26,7 @@ class Update
                 $exceptions["access_token"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
             }
-            if (count($p) <= 1) {
-                throw new \Exception("Запрос пустой не имеет параметров.");
-            }
+
 
             $accessToken = $p["access_token"];
             $tokenStructur = new TokenStructur($this->container);
@@ -97,10 +95,16 @@ class Update
             $qSet = $qSet . (empty($p["phone"]) ? "" : " phone='{$p["phone"]}',");
             $qSet = $qSet . (empty($p["email"]) ? "" : " email='{$p["email"]}',");
             $qSet = (empty($qSet) ? "" : substr($qSet, 0, -1));
-
+            if (empty($qSet)) {
+                throw new \Exception("Запрос пустой не имеет параметров.");
+            }
             $q = "update users set {$qSet} where user_id={$tokenStructur->getUserID()} RETURNING *;";
             $db = $this->container['db'];
             $user = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            if(empty($user["user_id"])){
+                throw new \Exception("Такой пользователь не существует.");
+            }
+
             unset($user['password']);
             return ["status" => "ok",
                 "data" => ["user" => $user],
