@@ -78,7 +78,7 @@ class Upload
                     }
                     imagejpeg($file, $path . "/" . $name);
                     // сохранить миниатюру файл на сервер
-                    $filemini = $cImg->isTransform($path . "/" . $name, 90);
+                    $filemini = $cImg->isTransform($path . "/" . $name, 120);
                     $pathmini = MP_PRODIR . "/public/photos/$userID/mini";
                     if (!file_exists($pathmini)) {
                         mkdir($pathmini, 0777, true);

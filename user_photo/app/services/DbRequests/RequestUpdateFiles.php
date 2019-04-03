@@ -15,15 +15,17 @@ class RequestUpdateFiles
             $files = scandir(MP_PRODIR . "/public/photos/$userID/origin");
             $origin = array();
             foreach ($files as $key => $file) {
+                $key=str_replace(".jpg", "", $file);
                 if ($file != "." && $file != "..") {
-                    $origin[] = "/public/photos/$userID/origin/" . $file;
+                    $origin[$key] = "/public/photos/$userID/origin/" . $file;
                 }
             }
             $files = scandir(MP_PRODIR . "/public/photos/$userID/mini");
             $mini = array();
             foreach ($files as $key => $file) {
+                $key=str_replace(".jpg", "", $file);
                 if ($file != "." && $file != "..") {
-                    $mini[] = "/public/photos/$userID/mini/" . $file;
+                    $mini[$key] = "/public/photos/$userID/mini/" . $file;
                 }
             }
 
