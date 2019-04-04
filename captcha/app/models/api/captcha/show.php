@@ -57,7 +57,7 @@ class Show
 
             $answer = "";
             // создаем  загадку
-            for ($i = 0; $i < rand(3, 4); $i++) {
+            for ($i = 0; $i < rand(1, 1); $i++) {
                 $scirand = rand(0, 2);
                 if ($scirand == 0) {
                     $answer = $answer . chr(rand(49, 57));

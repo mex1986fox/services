@@ -81,6 +81,13 @@ class Update
                     $exceptions["phone"] = "Не соответствует типу integer.";
                 }
             }
+            
+            if (!empty($p["avatar"])) {
+                $vUri=$valid->Uri;
+                if (!$vUri->isValid($p["avatar"])) {
+                    $exceptions["avatar"] = "Не соответствует типу uri.";
+                }
+            }
             if (!empty($exceptions)) {
                 throw new \Exception("Ошибки в параметрах.");
             }
@@ -94,6 +101,7 @@ class Update
             $qSet = $qSet . (empty($p["city_id"]) ? "" : " city_id={$p["city_id"]},");
             $qSet = $qSet . (empty($p["phone"]) ? "" : " phone='{$p["phone"]}',");
             $qSet = $qSet . (empty($p["email"]) ? "" : " email='{$p["email"]}',");
+            $qSet = $qSet . (empty($p["avatar"]) ? "" : " avatar='{$p["avatar"]}',");
             $qSet = (empty($qSet) ? "" : substr($qSet, 0, -1));
             if (empty($qSet)) {
                 throw new \Exception("Запрос пустой не имеет параметров.");

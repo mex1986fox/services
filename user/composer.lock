@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bcdaf290d10db1fcc39171f749dd10d2",
+    "content-hash": "d5c40c114b456a62dc8aad3df4fdd185",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -353,6 +353,51 @@
             "time": "2019-01-15T13:21:25+00:00"
         },
         {
+            "name": "zendframework/zend-escaper",
+            "version": "2.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendframework/zend-escaper.git",
+                "reference": "31d8aafae982f9568287cb4dce987e6aff8fd074"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendframework/zend-escaper/zipball/31d8aafae982f9568287cb4dce987e6aff8fd074",
+                "reference": "31d8aafae982f9568287cb4dce987e6aff8fd074",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.6 || ^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7.27 || ^6.5.8 || ^7.1.2",
+                "zendframework/zend-coding-standard": "~1.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.6.x-dev",
+                    "dev-develop": "2.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Zend\\Escaper\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Securely and safely escape HTML, HTML attributes, JavaScript, CSS, and URLs",
+            "keywords": [
+                "ZendFramework",
+                "escaper",
+                "zf"
+            ],
+            "time": "2018-04-25T15:48:53+00:00"
+        },
+        {
             "name": "zendframework/zend-filter",
             "version": "2.9.1",
             "source": {
@@ -462,6 +507,53 @@
                 "zf"
             ],
             "time": "2018-08-28T21:34:05+00:00"
+        },
+        {
+            "name": "zendframework/zend-uri",
+            "version": "2.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendframework/zend-uri.git",
+                "reference": "b2785cd38fe379a784645449db86f21b7739b1ee"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendframework/zend-uri/zipball/b2785cd38fe379a784645449db86f21b7739b1ee",
+                "reference": "b2785cd38fe379a784645449db86f21b7739b1ee",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.6 || ^7.0",
+                "zendframework/zend-escaper": "^2.5",
+                "zendframework/zend-validator": "^2.10"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7.27 || ^6.5.8 || ^7.1.4",
+                "zendframework/zend-coding-standard": "~1.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.7.x-dev",
+                    "dev-develop": "2.8.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Zend\\Uri\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "A component that aids in manipulating and validating » Uniform Resource Identifiers (URIs)",
+            "keywords": [
+                "ZendFramework",
+                "uri",
+                "zf"
+            ],
+            "time": "2019-02-27T21:39:04+00:00"
         },
         {
             "name": "zendframework/zend-validator",

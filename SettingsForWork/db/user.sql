@@ -16,6 +16,7 @@ CREATE TABLE "users" (
     city_id INTEGER,
     phone varchar(20),
     email varchar(256),
+    avatar text,
     PRIMARY KEY (user_id)
 );
 
