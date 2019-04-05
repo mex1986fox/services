@@ -27,12 +27,12 @@ class Show
             // пишем в базу
             $db = $this->container['db'];
             $q =
-                " select user_id, login, users.name, surname, birthdate, phone, email,".
+                " select user_id, login, avatar, users.name, surname, birthdate, phone, email,  " .
                 " cities.city_id, cities.name as city, subjects.subject_id, subjects.name as subject, " .
                 " countries.country_id, countries.name as country from users " .
                 " LEFT JOIN cities ON cities.city_id = users.city_id " .
-                " LEFT JOIN subjects ON subjects.subject_id = cities.subject_id ".
-                " LEFT JOIN countries ON countries.country_id = cities.country_id ".
+                " LEFT JOIN subjects ON subjects.subject_id = cities.subject_id " .
+                " LEFT JOIN countries ON countries.country_id = cities.country_id " .
                 $qWhere;
             $users = $db->query($q, \PDO::FETCH_ASSOC)->fetchAll();
 
