@@ -18,12 +18,18 @@ class Show
             // передаем параметры в переменные
             $p = $this->request->getQueryParams();
             $userID = empty($p["user_id"]) ? "" : $p["user_id"];
+            $login = empty($p["login"]) ? "" : $p["login"];
+
+            // проверяем параметры
 
             // строим запрос
             $qWhere = "";
-            $qWhere = $qWhere . (empty($userID) ? "" : " user_id=" . $userID);
-            $qWhere = (empty($qWhere) ? "" : " where ") . $qWhere;
+            $qWhere = $qWhere . (empty($userID) ? "" : " user_id=" . $userID . " and ");
+            $qWhere = $qWhere . (empty($login) ? "" : " login ILIKE '%" . $login . "%' and ");
 
+            $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' or ');
+            $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' and ');
+            $qWhere = (empty($qWhere) ? "" : " where ") . $qWhere;
             // пишем в базу
             $db = $this->container['db'];
             $q =
