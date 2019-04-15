@@ -28,6 +28,7 @@ class Show
             // строим запрос
             $qWhere = "";
             $qWhere = $qWhere . (empty($usersID) ? "" : " user_id in ({$usersID}) ");
+            
             $qWhere = (empty($qWhere) ? "" : " where ") . $qWhere;
 
             // пишем в базу

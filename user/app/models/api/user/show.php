@@ -19,13 +19,32 @@ class Show
             $p = $this->request->getQueryParams();
             $userID = empty($p["user_id"]) ? "" : $p["user_id"];
             $login = empty($p["login"]) ? "" : $p["login"];
-
+            $name = empty($p["name"]) ? "" : $p["name"];
+            $surname = empty($p["surname"]) ? "" : $p["surname"];
+            $countriesID = empty($p["countries_id"]) ? "" : array_diff($p["countries_id"], array(''));
+            $subjectsID = empty($p["subjects_id"]) ? "" : array_diff($p["subjects_id"], array(''));
+            $citiesID = empty($p["cities_id"]) ? "" : array_diff($p["cities_id"], array(''));
             // проверяем параметры
 
             // строим запрос
             $qWhere = "";
             $qWhere = $qWhere . (empty($userID) ? "" : " user_id=" . $userID . " and ");
-            $qWhere = $qWhere . (empty($login) ? "" : " login ILIKE '%" . $login . "%' and ");
+            $qWhere = $qWhere . (empty($login) ? "" : " users.login ILIKE '%" . $login . "%' and ");
+            $qWhere = $qWhere . (empty($name) ? "" : " users.name ILIKE '%" . $name . "%' and ");
+            $qWhere = $qWhere . (empty($surname) ? "" : " users.surname ILIKE '%" . $surname . "%' and ");
+
+            //для местоположения
+            if (!empty($citiesID) || !empty($subjectsID) || !empty($countriesID)) {
+                $qWhere = $qWhere . " (";
+            } //  для страны
+            $qWhere = $qWhere . (empty($countriesID) ? "" : "countries.country_id in (" . implode(', ', $countriesID) . ") or ");
+            //  для региона
+            $qWhere = $qWhere . (empty($subjectsID) ? "" : "subjects.subject_id in (" . implode(', ', $subjectsID) . ") or ");
+            //  для города
+            $qWhere = $qWhere . (empty($citiesID) ? "" : "cities.city_id in (" . implode(', ', $citiesID) . ") or ");
+            if (!empty($citiesID) || !empty($subjectsID) || !empty($countriesID)) {
+                $qWhere = rtrim($qWhere, ' or ') . ") and ";
+            }
 
             $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' or ');
             $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' and ');
