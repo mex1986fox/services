@@ -7,7 +7,7 @@ use \App\Models\Api\Photos\Delete as Delete;
 use \App\Models\Api\Photos\Show as Show;
 use \App\Models\Api\Photos\Update as Update;
 
-class UserphotoController extends MainController
+class PostphotoController extends MainController
 {
     public function upload($request, $response, $args)
     {

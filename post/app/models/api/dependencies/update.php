@@ -94,12 +94,13 @@ class Update
                 $stm->execute();
             }
             $q =
-                ' insert into models (model_id, type_id, name) values (:model_id, :type_id, :name) ' .
+                ' insert into models (model_id, brand_id, type_id, name) values (:model_id, :brand_id, :type_id, :name) ' .
                 ' on conflict (model_id) do ' .
-                ' update set model_id=:model_id, type_id=:type_id, name=:name ';
+                ' update set model_id=:model_id, brand_id=:brand_id, type_id=:type_id, name=:name ';
             $stm = $db->prepare($q);
             foreach ($transport->models as $v) {
                 $stm->bindValue(':model_id', $v->model_id);
+                $stm->bindValue(':brand_id', $v->brand_id);
                 $stm->bindValue(':type_id', $v->type_id);
                 $stm->bindValue(':name', $v->name);
                 $stm->execute();

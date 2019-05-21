@@ -31,12 +31,21 @@ class Create
             if (empty($p["access_token"])) {
                 $exceptions["access_token"] = "Не указан.";
             }
+            if (empty($p["city_id"])) {
+                $exceptions["city_id"] = "Не указан.";
+            }
+            if (empty($p["model_id"])) {
+                $exceptions["model_id"] = "Не указан.";
+            }
+
             if (!empty($exceptions)) {
                 throw new \Exception("Ошибки в параметрах.");
             }
 
             $title = $p["title"];
             $description = $p["description"];
+            $cityID = $p["city_id"];
+            $modelID = $p["model_id"];
             $accessToken = $p["access_token"];
 
             $vStLen->setMin(1);
@@ -49,6 +58,13 @@ class Create
             if (!$vStLen->isValid($description)) {
                 $exceptions["description"] = "Не соответсвует диапозону длины.";
             }
+            if (!is_numeric($cityID)) {
+                $exceptions["city_id"] = "Не соответствует типу integer.";
+            }
+            if (!is_numeric($modelID)) {
+                $exceptions["model_id"] = "Не соответствует типу integer.";
+            }
+
             //проверить токин
             //формируем токен
 
@@ -73,9 +89,9 @@ class Create
             // пишем в базу
             $db = $this->container['db'];
             $q = "insert into posts
-                    (user_id, title, description )
+                    (user_id, title, description, city_id, model_id)
                 values
-                    ({$userID},'{$title}','{$description}')
+                    ({$userID},'{$title}','{$description}',{$cityID},{$modelID})
                 returning *;";
             $sth = $db->query($q, \PDO::FETCH_ASSOC);
             $post = $sth->fetch();

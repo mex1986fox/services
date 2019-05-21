@@ -24,6 +24,14 @@ class Delete
                 $exceptions["access_token"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
             }
+            if (empty($p["post_id"])) {
+                $exceptions["post_id"] = "Не указан.";
+                throw new \Exception("Ошибки в параметрах.");
+            }
+            if (!is_numeric($p["post_id"])) {
+                $exceptions["post_id"] = "Не соответствует типу integer.";
+                throw new \Exception("Ошибки в параметрах.");
+            }
             if (empty($p["name_files"])) {
                 $exceptions["name_files"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
@@ -39,7 +47,7 @@ class Delete
 
             // проверяем параметры
             $valid = $this->container['validators'];
-            $tokenSKey=$this->container['services']['token']['key_access_token'];
+            $tokenSKey = $this->container['services']['token']['key_access_token'];
             $vToken = $valid->TokenValidator;
             $vToken->setKey($tokenSKey);
             if (!$vToken->isValid($tokenStructur)) {
@@ -49,6 +57,7 @@ class Delete
             $vLoadImg = $valid->ImgValidator;
             //вынимаем из токена id юзера
             $userID = $tokenStructur->getUserID();
+            $postID = $p["post_id"];
             $vStLen = $valid->StringLength;
             $vStLen->setMin(13);
             $vStLen->setMax(13);
@@ -60,25 +69,25 @@ class Delete
                 } else {
                     // удалить файл с сервера
                     $name = $file . ".jpg";
-                    $path = MP_PRODIR . "/public/photos/$userID/origin";
+                    $path = MP_PRODIR . "/public/photos/$userID/$postID/origin";
                     // echo $path . "/" . $name;
                     if (file_exists($path . "/" . $name)) {
                         unlink($path . "/" . $name);
                     }
                     // удалить миниатюру с сервера
                     $name = $file . ".jpg";
-                    $path = MP_PRODIR . "/public/photos/$userID/mini";
+                    $path = MP_PRODIR . "/public/photos/$userID/$postID/mini";
                     if (file_exists($path . "/" . $name)) {
                         unlink($path . "/" . $name);
                     }
                 }
             }
-            if(!empty($exceptions)){
+            if (!empty($exceptions)) {
                 throw new \Exception("Ошибки в параметрах.");
             }
             $dbreqwests = $this->container['db-requests'];
             $dbrUF = $dbreqwests->RequestUpdateFiles;
-            $dbrUFStatus = $dbrUF->go($userID);
+            $dbrUFStatus = $dbrUF->go($userID, $postID);
             if ($dbrUFStatus != true) {
                 throw new \Exception($dbrUFStatus);
             }

@@ -1,5 +1,5 @@
 <?php
-namespace App\Models\Api\User;
+namespace App\Models\Api\Post;
 
 use \App\Services\Structur\TokenStructur;
 
@@ -22,11 +22,19 @@ class Update
             $p = $this->request->getQueryParams();
 
             $exceptions = [];
+            if (empty($p["post_id"])) {
+                $exceptions["post_id"] = "Не указан.";
+                throw new \Exception("Ошибки в параметрах.");
+            }
+            if (!is_numeric($p["post_id"])) {
+                $exceptions["post_id"] = "Не соответствует типу integer.";
+                throw new \Exception("Ошибки в параметрах.");
+            }
+            $postID = $p["post_id"];
             if (empty($p["access_token"])) {
                 $exceptions["access_token"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
             }
-
 
             $accessToken = $p["access_token"];
             $tokenStructur = new TokenStructur($this->container);
@@ -41,29 +49,20 @@ class Update
                 $exceptions["access_token"] = "Не действителен.";
                 throw new \Exception("Ошибки в параметрах.");
             }
+
             $vStLen = $valid->StringLength;
             $vStLen->setMin(1);
-            $vStLen->setMax(64);
-            if (!empty($p["name"])) {
-                if (!$vStLen->isValid($p["name"])) {
-                    $exceptions["name"] = "От 1 до 64 символов.";
+            $vStLen->setMax(70);
+            if (!empty($p["title"])) {
+                if (!$vStLen->isValid($p["title"])) {
+                    $exceptions["title"] = "Не соответсвует диапозону длины.";
                 }
             }
-            if (!empty($p["surname"])) {
-                if (!$vStLen->isValid($p["surname"])) {
-                    $exceptions["surname"] = "От 1 до 64 символов.";
-                }
-            }
-            if (!empty($p["birthdate"])) {
-                $vDate = $valid->Date;
-                if (!$vDate->isValid($p["birthdate"])) {
-                    $exceptions["birthdate"] = "Не соответствует типу date.";
-                }
-            }
-            if (!empty($p["email"])) {
-                $vEmail = $valid->EmailAddress;
-                if (!$vEmail->isValid($p["email"])) {
-                    $exceptions["email"] = "Не соответствует типу email.";
+            $vStLen->setMin(1);
+            $vStLen->setMax(1600);
+            if (!empty($p["description"])) {
+                if (!$vStLen->isValid($p["description"])) {
+                    $exceptions["description"] = "Не соответсвует диапозону длины.";
                 }
             }
             if (!empty($p["city_id"])) {
@@ -71,21 +70,15 @@ class Update
                     $exceptions["city_id"] = "Не соответствует типу integer.";
                 }
             }
-            if (!empty($p["phone"])) {
-                $vStLen->setMin(11);
-                $vStLen->setMax(11);
-                if (!$vStLen->isValid($p["phone"])) {
-                    $exceptions["phone"] = "11 символов.";
-                }
-                if (!is_numeric($p["phone"])) {
-                    $exceptions["phone"] = "Не соответствует типу integer.";
+            if (!empty($p["type_id"])) {
+                if (!is_numeric($p["type_id"])) {
+                    $exceptions["type_id"] = "Не соответствует типу integer.";
                 }
             }
-            
-            if (!empty($p["avatar"])) {
-                $vUri=$valid->Uri;
-                if (!$vUri->isValid($p["avatar"])) {
-                    $exceptions["avatar"] = "Не соответствует типу uri.";
+            if (!empty($p["main_photo"])) {
+                $vUri = $valid->Uri;
+                if (!$vUri->isValid($p["main_photo"])) {
+                    $exceptions["main_photo"] = "Не соответствует типу uri.";
                 }
             }
             if (!empty($exceptions)) {
@@ -95,27 +88,23 @@ class Update
             // пишем в базу
             // формируем запрос
             $qSet = "";
-            $qSet = $qSet . (empty($p["name"]) ? "" : " name='{$p["name"]}',");
-            $qSet = $qSet . (empty($p["surname"]) ? "" : " surname='{$p["surname"]}',");
-            $qSet = $qSet . (empty($p["birthdate"]) ? "" : " birthdate='{$p["birthdate"]}',");
-            $qSet = $qSet . (empty($p["city_id"]) ? "" : " city_id={$p["city_id"]},");
-            $qSet = $qSet . (empty($p["phone"]) ? "" : " phone='{$p["phone"]}',");
-            $qSet = $qSet . (empty($p["email"]) ? "" : " email='{$p["email"]}',");
-            $qSet = $qSet . (empty($p["avatar"]) ? "" : " avatar='{$p["avatar"]}',");
+            $qSet = $qSet . (empty($p["title"]) ? "" : " title='{$p["title"]}',");
+            $qSet = $qSet . (empty($p["description"]) ? "" : " description='{$p["description"]}',");
+            $qSet = $qSet . (empty($p["city_id"]) ? "" : " city_id='{$p["city_id"]}',");
+            $qSet = $qSet . (empty($p["type_id"]) ? "" : " type_id='{$p["type_id"]}',");
+            $qSet = $qSet . (empty($p["main_photo"]) ? "" : " main_photo='{$p["main_photo"]}',");
             $qSet = (empty($qSet) ? "" : substr($qSet, 0, -1));
             if (empty($qSet)) {
                 throw new \Exception("Запрос пустой не имеет параметров.");
             }
-            $q = "update users set {$qSet} where user_id={$tokenStructur->getUserID()} RETURNING *;";
+            $q = "update posts set {$qSet} where user_id={$tokenStructur->getUserID()} and post_id={$postID} RETURNING *;";
             $db = $this->container['db'];
-            $user = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-            if(empty($user["user_id"])){
-                throw new \Exception("Такой пользователь не существует.");
+            $post = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            if (empty($post["user_id"])) {
+                throw new \Exception("Такой пост не существует.");
             }
-
-            unset($user['password']);
             return ["status" => "ok",
-                "data" => ["user" => $user],
+                "data" => ["post" => $post],
             ];
 
         } catch (RuntimeException | \Exception $e) {

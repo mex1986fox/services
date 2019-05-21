@@ -24,6 +24,14 @@ class Upload
                 $exceptions["access_token"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
             }
+            if (empty($p["post_id"])) {
+                $exceptions["post_id"] = "Не указан.";
+                throw new \Exception("Ошибки в параметрах.");
+            }
+            if (!is_numeric($p["post_id"])) {
+                $exceptions["post_id"] = "Не соответствует типу integer.";
+                throw new \Exception("Ошибки в параметрах.");
+            }
             if (empty($_FILES["files"])) {
                 $exceptions["files"] = "Не указан.";
                 throw new \Exception("Ошибки в параметрах.");
@@ -39,7 +47,7 @@ class Upload
             // проверяем параметры
 
             $valid = $this->container['validators'];
-            $tokenSKey=$this->container['services']['token']['key_access_token'];
+            $tokenSKey = $this->container['services']['token']['key_access_token'];
             $vToken = $valid->TokenValidator;
             $vToken->setKey($tokenSKey);
             if (!$vToken->isValid($tokenStructur)) {
@@ -50,7 +58,7 @@ class Upload
             $vLoadImg = $valid->ImgValidator;
             //вынимаем из токена id юзера
             $userID = $tokenStructur->getUserID();
-
+            $postID = $p["post_id"];
             // добавляем конвертер
             $converters = $this->container['converters'];
             $cImg = $converters->ImgConverter;
@@ -72,14 +80,14 @@ class Upload
                     $file = $cImg->isTransform($file['tmp_name'], 1024);
                     // сохранить файл на сервер
                     $name = uniqid() . ".jpg";
-                    $path = MP_PRODIR . "/public/photos/$userID/origin";
+                    $path = MP_PRODIR . "/public/photos/$userID/$postID/origin";
                     if (!file_exists($path)) {
                         mkdir($path, 0777, true);
                     }
                     imagejpeg($file, $path . "/" . $name);
                     // сохранить миниатюру файл на сервер
-                    $filemini = $cImg->isTransform($path . "/" . $name, 120);
-                    $pathmini = MP_PRODIR . "/public/photos/$userID/mini";
+                    $filemini = $cImg->isTransform($path . "/" . $name, 320);
+                    $pathmini = MP_PRODIR . "/public/photos/$userID/$postID/mini";
                     if (!file_exists($pathmini)) {
                         mkdir($pathmini, 0777, true);
                     }
@@ -95,7 +103,7 @@ class Upload
             // обновим список файлов в базе
             $dbreqwests = $this->container['db-requests'];
             $dbrUF = $dbreqwests->RequestUpdateFiles;
-            $dbrUFStatus = $dbrUF->go($userID);
+            $dbrUFStatus = $dbrUF->go($userID, $postID);
             if ($dbrUFStatus != true) {
                 throw new \Exception($dbrUFStatus);
             }

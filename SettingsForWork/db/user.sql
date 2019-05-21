@@ -17,6 +17,7 @@ CREATE TABLE "users" (
     phone varchar(20),
     email varchar(256),
     avatar text,
+    date_create timestamp default current_timestamp,
     PRIMARY KEY (user_id)
 );
 

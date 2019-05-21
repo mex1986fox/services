@@ -27,7 +27,6 @@ class Update
                 throw new \Exception("Ошибки в параметрах.");
             }
 
-
             $accessToken = $p["access_token"];
             $tokenStructur = new TokenStructur($this->container);
             $tokenStructur->setToken($accessToken);
@@ -81,9 +80,9 @@ class Update
                     $exceptions["phone"] = "Не соответствует типу integer.";
                 }
             }
-            
+
             if (!empty($p["avatar"])) {
-                $vUri=$valid->Uri;
+                $vUri = $valid->Uri;
                 if (!$vUri->isValid($p["avatar"])) {
                     $exceptions["avatar"] = "Не соответствует типу uri.";
                 }
@@ -101,7 +100,9 @@ class Update
             $qSet = $qSet . (empty($p["city_id"]) ? "" : " city_id={$p["city_id"]},");
             $qSet = $qSet . (empty($p["phone"]) ? "" : " phone='{$p["phone"]}',");
             $qSet = $qSet . (empty($p["email"]) ? "" : " email='{$p["email"]}',");
-            $qSet = $qSet . (empty($p["avatar"]) ? "" : " avatar='{$p["avatar"]}',");
+            if (!empty($p["avatar"])) {
+                $qSet = $qSet . ($p["avatar"] == "null" ? " avatar=null," : " avatar='{$p["avatar"]}',");
+            }
             $qSet = (empty($qSet) ? "" : substr($qSet, 0, -1));
             if (empty($qSet)) {
                 throw new \Exception("Запрос пустой не имеет параметров.");
@@ -109,7 +110,7 @@ class Update
             $q = "update users set {$qSet} where user_id={$tokenStructur->getUserID()} RETURNING *;";
             $db = $this->container['db'];
             $user = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-            if(empty($user["user_id"])){
+            if (empty($user["user_id"])) {
                 throw new \Exception("Такой пользователь не существует.");
             }
 

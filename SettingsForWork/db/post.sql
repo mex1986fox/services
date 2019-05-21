@@ -10,11 +10,12 @@ CREATE TABLE "posts" (
     post_id bigserial,
     user_id bigint NOT NULL,
     city_id INTEGER,
-    type_id INTEGER,
+    model_id INTEGER,
     title text NOT NULL,
     description text NOT NULL,
+    main_photo text,
     date_create timestamp default current_timestamp,
-    PRIMARY KEY (post_id)
+    PRIMARY KEY (user_id, post_id)
 );
 ALTER TABLE "posts"
 ADD CONSTRAINT unique_posts_title UNIQUE (user_id, title);
