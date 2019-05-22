@@ -53,29 +53,44 @@ class Update
             $vStLen = $valid->StringLength;
             $vStLen->setMin(1);
             $vStLen->setMax(70);
-            if (!empty($p["title"])) {
+            if (isset($p["title"])) {
+                if ($p["title"] == "") {
+                    $exceptions["title"] = "Пустое значение.";
+                }
                 if (!$vStLen->isValid($p["title"])) {
                     $exceptions["title"] = "Не соответсвует диапозону длины.";
                 }
             }
             $vStLen->setMin(1);
             $vStLen->setMax(1600);
-            if (!empty($p["description"])) {
+            if (isset($p["description"])) {
+                if ($p["description"] == "") {
+                    $exceptions["description"] = "Пустое значение.";
+                }
                 if (!$vStLen->isValid($p["description"])) {
                     $exceptions["description"] = "Не соответсвует диапозону длины.";
                 }
             }
-            if (!empty($p["city_id"])) {
+            if (isset($p["city_id"])) {
+                if ($p["city_id"] == "") {
+                    $exceptions["city_id"] = "Пустое значение.";
+                }
                 if (!is_numeric($p["city_id"])) {
                     $exceptions["city_id"] = "Не соответствует типу integer.";
                 }
             }
-            if (!empty($p["type_id"])) {
-                if (!is_numeric($p["type_id"])) {
-                    $exceptions["type_id"] = "Не соответствует типу integer.";
+            if (isset($p["model_id"])) {
+                if ($p["model_id"] == "") {
+                    $exceptions["model_id"] = "Пустое значение.";
+                }
+                if (!is_numeric($p["model_id"])) {
+                    $exceptions["model_id"] = "Не соответствует типу integer.";
                 }
             }
-            if (!empty($p["main_photo"])) {
+            if (isset($p["main_photo"])) {
+                if ($p["main_photo"] == "") {
+                    $exceptions["main_photo"] = "Пустое значение.";
+                }
                 $vUri = $valid->Uri;
                 if (!$vUri->isValid($p["main_photo"])) {
                     $exceptions["main_photo"] = "Не соответствует типу uri.";
@@ -91,8 +106,10 @@ class Update
             $qSet = $qSet . (empty($p["title"]) ? "" : " title='{$p["title"]}',");
             $qSet = $qSet . (empty($p["description"]) ? "" : " description='{$p["description"]}',");
             $qSet = $qSet . (empty($p["city_id"]) ? "" : " city_id='{$p["city_id"]}',");
-            $qSet = $qSet . (empty($p["type_id"]) ? "" : " type_id='{$p["type_id"]}',");
-            $qSet = $qSet . (empty($p["main_photo"]) ? "" : " main_photo='{$p["main_photo"]}',");
+            $qSet = $qSet . (empty($p["model_id"]) ? "" : " model_id='{$p["model_id"]}',");
+            if (!empty($p["main_photo"])) {
+                $qSet = $qSet . ($p["main_photo"] == "null" ? " main_photo=null," : " main_photo='{$p["main_photo"]}',");
+            }
             $qSet = (empty($qSet) ? "" : substr($qSet, 0, -1));
             if (empty($qSet)) {
                 throw new \Exception("Запрос пустой не имеет параметров.");

@@ -1,5 +1,5 @@
 <?php
-namespace App\Models\Api\User;
+namespace App\Models\Api\Users;
 
 class Show
 {
@@ -134,7 +134,7 @@ class Show
             // пишем в базу
             $db = $this->container['db'];
             $q =
-                " select user_id, login, avatar, users.name, surname, birthdate, email,  " .
+                " select user_id, login, avatar, users.name, surname, birthdate, email, " .
                 " cities.city_id, cities.name as city, subjects.subject_id, subjects.name as subject, " .
                 " countries.country_id, countries.name as country from users " .
                 " LEFT JOIN cities ON cities.city_id = users.city_id " .

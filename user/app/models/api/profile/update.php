@@ -1,5 +1,5 @@
 <?php
-namespace App\Models\Api\User;
+namespace App\Models\Api\Profile;
 
 use \App\Services\Structur\TokenStructur;
 
@@ -116,7 +116,7 @@ class Update
 
             unset($user['password']);
             return ["status" => "ok",
-                "data" => ["user" => $user],
+                "data" => ["profile" => $user],
             ];
 
         } catch (RuntimeException | \Exception $e) {

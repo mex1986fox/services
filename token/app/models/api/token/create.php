@@ -55,7 +55,7 @@ class Create
             //отправляем запрос к сервису пользователей
             $requests = $this->container["api-requests"];
             $requestsToUser = $requests->RequestToUser;
-            $response = $requestsToUser->go("/api/user/authentificate", ["login" => $login, "password" => $password]);
+            $response = $requestsToUser->go("/api/profile/authentificate", ["login" => $login, "password" => $password]);
             if ($response == false) {
                 throw new \Exception("Ошибки на сервисе пользователей.");
             }

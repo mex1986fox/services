@@ -2,12 +2,12 @@
 namespace App\Controllers\Api;
 
 use \App\Controllers\MainController;
-use \App\Models\Api\User\Authentificate as Authentificate;
-use \App\Models\Api\User\Create as Create;
-use \App\Models\Api\User\Show as Show;
-use \App\Models\Api\User\Update as Update;
+use \App\Models\Api\Users\Authentificate as Authentificate;
+use \App\Models\Api\Users\Create as Create;
+use \App\Models\Api\Users\Show as Show;
+use \App\Models\Api\Users\Update as Update;
 
-class UserController extends MainController
+class UsersController extends MainController
 {
     public function create($request, $response, $args)
     {

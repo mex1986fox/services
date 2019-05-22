@@ -1,5 +1,5 @@
 <?php
-namespace App\Models\Api\User;
+namespace App\Models\Api\Profile;
 
 class Authentificate
 {

@@ -1,5 +1,5 @@
 <?php
-namespace App\Models\Api\User;
+namespace App\Models\Api\Profile;
 
 use \App\Services\Structur\CaptchaTokenStructur;
 
