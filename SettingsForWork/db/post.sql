@@ -22,6 +22,16 @@ ADD CONSTRAINT unique_posts_title UNIQUE (user_id, title);
 ALTER TABLE "posts"
 ADD CONSTRAINT unique_posts_description UNIQUE (user_id, description);
 
+-- лайки
+CREATE table "votes" (
+    user_id bigint NOT NULL,
+    post_id bigint NOT NULL,
+    likes bigint,
+    dislikes bigint,
+    profiles integer[],
+    PRIMARY KEY (user_id, post_id)
+);
+
 -- страны
 CREATE table "countries" (
     country_id INTEGER UNIQUE NOT NULL,

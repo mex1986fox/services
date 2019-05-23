@@ -5,7 +5,7 @@ use \App\Controllers\MainController;
 use \App\Models\Api\Post\Create as Create;
 use \App\Models\Api\Post\Show as Show;
 use \App\Models\Api\Post\Update as Update;
-
+use \App\Models\Api\Post\Delete as Delete;
 class PostController extends MainController
 {
     public function create($request, $response, $args)
@@ -46,6 +46,22 @@ class PostController extends MainController
     {
         $cont = $this->container;
         $reg = new Update($cont, $request, $response);
+        $answer = $reg->run();
+        if ($answer['status'] == "ok") {
+            $response = $response->withJson($answer, 200);
+        }
+        if ($answer['status'] == "except") {
+            $response = $response->withJson($answer, 400);
+        }
+        if ($answer['status'] == "error") {
+            $response = $response->withJson($answer, 404);
+        }
+        return $response;
+    }
+    public function delete($request, $response, $args)
+    {
+        $cont = $this->container;
+        $reg = new Delete($cont, $request, $response);
         $answer = $reg->run();
         if ($answer['status'] == "ok") {
             $response = $response->withJson($answer, 200);

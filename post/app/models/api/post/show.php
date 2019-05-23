@@ -66,32 +66,32 @@ class Show
 
             switch ($sortID) {
                 case 0:
-                    $qSort = $qSort . "posts.date_create DESC, post_id DESC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (posts.date_create, post_id)<('" . $sfBlog["date_create"] . "', " . $sfBlog["post_id"] . ") and ");
+                    $qSort = $qSort . "posts.date_create DESC, posts.post_id DESC, ";
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (posts.date_create, posts.post_id)<('" . $sfBlog["date_create"] . "', " . $sfBlog["post_id"] . ") and ");
                     break;
                 case 1:
-                    $qSort = $qSort . "posts.date_create DESC, post_id DESC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (posts.date_create, post_id)<('" . $sfBlog["date_create"] . "', " . $sfBlog["post_id"] . ") and ");
+                    $qSort = $qSort . "posts.date_create DESC, posts.post_id DESC, ";
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (posts.date_create, posts.post_id)<('" . $sfBlog["date_create"] . "', " . $sfBlog["post_id"] . ") and ");
                     break;
                 case 2:
-                    $qSort = $qSort . "posts.date_create ASC, post_id ASC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (posts.date_create, post_id)>('" . $sfBlog["date_create"] . "', " . $sfBlog["post_id"] . ") and ");
+                    $qSort = $qSort . "posts.date_create ASC, posts.post_id ASC, ";
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (posts.date_create, posts.post_id)>('" . $sfBlog["date_create"] . "', " . $sfBlog["post_id"] . ") and ");
                     break;
                 case 3:
-                    $qSort = $qSort . "cities.name ASC, post_id ASC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (cities.name, post_id)>('" . $sfBlog["city"] . "', " . $sfBlog["post_id"] . ") and ");
+                    $qSort = $qSort . "cities.name ASC, posts.post_id ASC, ";
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (cities.name, posts.post_id)>('" . $sfBlog["city"] . "', " . $sfBlog["post_id"] . ") and ");
                     break;
                 case 4:
-                    $qSort = $qSort . "cities.name desc, post_id desc, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (cities.name, post_id)<('" . $sfBlog["city"] . "', " . $sfBlog["post_id"] . ") and ");
+                    $qSort = $qSort . "cities.name desc, posts.post_id desc, ";
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (cities.name, posts.post_id)<('" . $sfBlog["city"] . "', " . $sfBlog["post_id"] . ") and ");
                     break;
                 case 5:
-                    $qSort = $qSort . "models.name ASC, post_id ASC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (models.name, post_id)>('" . $sfBlog["model"] . "', " . $sfBlog["post_id"] . ") and ");
+                    $qSort = $qSort . "models.name ASC, posts.post_id ASC, ";
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (models.name, posts.post_id)>('" . $sfBlog["model"] . "', " . $sfBlog["post_id"] . ") and ");
                     break;
                 case 6:
-                    $qSort = $qSort . "models.name desc, post_id desc, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (models.name, post_id)<('" . $sfBlog["model"] . "', " . $sfBlog["post_id"] . ") and ");
+                    $qSort = $qSort . "models.name desc, posts.post_id desc, ";
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (models.name, posts.post_id)<('" . $sfBlog["model"] . "', " . $sfBlog["post_id"] . ") and ");
                     break;
             }
 
@@ -126,17 +126,20 @@ class Show
             // пишем в базу
             $db = $this->container['db'];
             $q =
-                " select user_id, post_id, posts.date_create, posts.title, posts.description, posts.main_photo," .
+                " select posts.user_id as user_id, posts.post_id as post_id, posts.date_create, posts.title, posts.description, posts.main_photo," .
                 " cities.city_id, cities.name as city, subjects.subject_id, subjects.name as subject, " .
                 " countries.country_id, countries.name as country, " .
                 " models.model_id, models.name as model, brands.brand_id, brands.name as brand, " .
-                " types.type_id, types.name as type from posts " .
+                " types.type_id, types.name as type,  " .
+                " votes.likes as likes, votes.dislikes as dislikes " .
+                " from posts " .
                 " LEFT JOIN cities ON cities.city_id = posts.city_id " .
                 " LEFT JOIN subjects ON subjects.subject_id = cities.subject_id " .
                 " LEFT JOIN countries ON countries.country_id = cities.country_id " .
                 " LEFT JOIN models ON models.model_id = posts.model_id " .
                 " LEFT JOIN brands ON brands.brand_id = models.brand_id " .
                 " LEFT JOIN types ON types.type_id = models.type_id " .
+                " LEFT JOIN votes ON votes.user_id = posts.user_id  and votes.post_id = posts.post_id" .
                 $qWhere . $qSort . " LIMIT 5";
             $posts = $db->query($q, \PDO::FETCH_ASSOC)->fetchAll();
             return ["status" => "ok",
