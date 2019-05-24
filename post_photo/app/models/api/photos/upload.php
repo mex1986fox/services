@@ -20,41 +20,32 @@ class Upload
             // передаем параметры в переменные
             $p = $this->request->getQueryParams();
             $exceptions = [];
-            if (empty($p["access_token"])) {
-                $exceptions["access_token"] = "Не указан.";
-                throw new \Exception("Ошибки в параметрах.");
-            }
-            if (empty($p["post_id"])) {
-                $exceptions["post_id"] = "Не указан.";
-                throw new \Exception("Ошибки в параметрах.");
-            }
-            if (!is_numeric($p["post_id"])) {
-                $exceptions["post_id"] = "Не соответствует типу integer.";
-                throw new \Exception("Ошибки в параметрах.");
-            }
-            if (empty($_FILES["files"])) {
-                $exceptions["files"] = "Не указан.";
-                throw new \Exception("Ошибки в параметрах.");
-            }
-            if (!is_array($_FILES["files"]["name"])) {
-                $exceptions["files"] = "Должен быть массивом.";
-                throw new \Exception("Ошибки в параметрах.");
-            }
-            $accessToken = $p["access_token"];
-            $tokenStructur = new TokenStructur($this->container);
-            $tokenStructur->setToken($accessToken);
-
-            // проверяем параметры
 
             $valid = $this->container['validators'];
-            $tokenSKey = $this->container['services']['token']['key_access_token'];
-            $vToken = $valid->TokenValidator;
-            $vToken->setKey($tokenSKey);
-            if (!$vToken->isValid($tokenStructur)) {
-                $exceptions["access_token"] = "Не действителен.";
-                throw new \Exception("Ошибки в параметрах.");
-            }
+            $vMethods = $valid->MethodsValidator;
+            // проверяем обязательные для ввода
+            $vMethods->isValid([
+                "empty" => [
+                    ["access_token", $p["access_token"]],
+                    ["post_id", $p["post_id"]],
+                    ["files", $p["files"]],
+                ],
+            ]);
 
+            //передаем в переменные
+            $postID = $p["post_id"];
+            $files = $p["files"];
+            $accessToken = $p["access_token"];
+            // проверяем параметры
+            $vMethods->isValid([
+                "token" => [["access_token", $accessToken]],
+                "isNumeric" => [["post_id", $postID]],
+                "isArray" => [["files", $files]],
+            ]);
+
+            $tokenStructur = new TokenStructur($this->container);
+            $tokenStructur->setToken($accessToken);
+            
             $vLoadImg = $valid->ImgValidator;
             //вынимаем из токена id юзера
             $userID = $tokenStructur->getUserID();
