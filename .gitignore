@@ -1,3 +1,6 @@
+captcha/vendor
+post/vendor
+post_photo/vendor
 user/vendor
 user_photo/vendor
 user_photo/public/photos

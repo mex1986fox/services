@@ -19,54 +19,43 @@ class Create
         try {
             $p = $this->request->getQueryParams();
             $exceptions = [];
-            // проверяем параметры
-            if (!isset($p["vote"])) {
-                $exceptions["vote"] = "Не указан.";
-            }
-            if (empty($p["access_token"])) {
-                $exceptions["access_token"] = "Не указан.";
-            }
-            if (empty($p["user_id"])) {
-                $exceptions["user_id"] = "Не указан.";
-            }
-            if (empty($p["post_id"])) {
-                $exceptions["post_id"] = "Не указан.";
-            }
-            if (!empty($exceptions)) {
+
+            $valid = $this->container['validators'];
+            $vMethods = $valid->MethodsValidator;
+            // проверяем обязательные для ввода
+            if (!$vMethods->isValid([
+                "emptyParams" => [
+                    ["access_token", $p],
+                    ["user_id", $p],
+                    ["post_id", $p],
+                ],
+                "isSetParams" => [
+                    ["vote", $p],
+                ]])) {
+                $exceptions = $vMethods->getExceptions();
                 throw new \Exception("Ошибки в параметрах.");
-            }
-            $vote = filter_var((integer) $p["vote"], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            };
+
             $accessToken = $p["access_token"];
             $userID = $p["user_id"];
             $postID = $p["post_id"];
-
-            if ($vote === null) {
-                $exceptions["vote"] = "Не соответсвует типу boolian.";
-            }
-            if (!is_numeric($userID)) {
-                $exceptions["user_id"] = "Не соответствует типу integer.";
-            }
-            if (!is_numeric($postID)) {
-                $exceptions["post_id"] = "Не соответствует типу integer.";
-            }
-            //проверить токин
-            $tokenStructur = new TokenStructur($this->container);
-            $tokenStructur->setToken($accessToken);
+            $vote = $p["vote"];
 
             // проверяем параметры
-            $valid = $this->container['validators'];
-            $tokenSKey = $this->container['services']['token']['key_access_token'];
-            $vToken = $valid->TokenValidator;
-            $vToken->setKey($tokenSKey);
-            if (!$vToken->isValid($tokenStructur)) {
-                $exceptions["access_token"] = "Не действителен.";
+            if (!$vMethods->isValid([
+                "isAccessToken" => [["access_token", $accessToken]],
+                "isNumeric" => [
+                    ["post_id", $postID],
+                    ["user_id", $userID]],
+                "isBool" => [["vote", $vote]],
+            ])) {
+                $exceptions = $vMethods->getExceptions();
                 throw new \Exception("Ошибки в параметрах.");
             }
-            $profileID = $tokenStructur->getUserID();
 
-            if (!empty($exceptions)) {
-                throw new \Exception("Ошибки в параметрах.");
-            }
+            $tokenStructur = new TokenStructur($this->container);
+            $tokenStructur->setToken($accessToken);
+            $profileID = $tokenStructur->getUserID();
 
             $db = $this->container['db'];
             // формируем запрос на проверку такого поста

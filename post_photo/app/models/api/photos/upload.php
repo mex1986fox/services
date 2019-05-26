@@ -24,28 +24,34 @@ class Upload
             $valid = $this->container['validators'];
             $vMethods = $valid->MethodsValidator;
             // проверяем обязательные для ввода
-            $vMethods->isValid([
-                "empty" => [
-                    ["access_token", $p["access_token"]],
-                    ["post_id", $p["post_id"]],
-                    ["files", $p["files"]],
-                ],
-            ]);
+
+            if (!$vMethods->isValid([
+                "emptyParams" => [
+                    ["access_token", $p],
+                    ["post_id", $p],
+                    ["files", $_FILES],
+                ]])) {
+                $exceptions = $vMethods->getExceptions();
+                throw new \Exception("Ошибки в параметрах.");
+            };
 
             //передаем в переменные
             $postID = $p["post_id"];
-            $files = $p["files"];
+            $files = $_FILES["files"]["name"];
             $accessToken = $p["access_token"];
             // проверяем параметры
-            $vMethods->isValid([
-                "token" => [["access_token", $accessToken]],
+            if (!$vMethods->isValid([
                 "isNumeric" => [["post_id", $postID]],
+                "isAccessToken" => [["access_token", $accessToken]],
                 "isArray" => [["files", $files]],
-            ]);
+            ])) {
+                $exceptions = $vMethods->getExceptions();
+                throw new \Exception("Ошибки в параметрах.");
+            }
 
             $tokenStructur = new TokenStructur($this->container);
             $tokenStructur->setToken($accessToken);
-            
+
             $vLoadImg = $valid->ImgValidator;
             //вынимаем из токена id юзера
             $userID = $tokenStructur->getUserID();

@@ -64,6 +64,12 @@ class MethodsValidator extends AbstractValidator
     public function emptyParams($name, $p)
     {
         if (empty($p[$name])) {
+            $this->pushExc($name, "Пустое значение.");
+        }
+    }
+    public function isSetParams($name, $p)
+    {
+        if (!isset($p[$name])) {
             $this->pushExc($name, "Не указан.");
         }
     }
@@ -71,6 +77,12 @@ class MethodsValidator extends AbstractValidator
     {
         if (!is_numeric($value)) {
             $this->pushExc($name, "Не соответствует типу Numeric.");
+        }
+    }
+    public function isBool($name, $value)
+    {
+        if (!is_bool((Boolean) $value)) {
+            $this->pushExc($name, "Не соответствует типу Boolean.");
         }
     }
     public function isArray($name, $value)
