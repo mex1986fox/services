@@ -70,6 +70,7 @@ class Authentificate
             return [
                 "status" => "except",
                 "data" => $exceptions,
+                
             ];
         }
     }
