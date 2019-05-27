@@ -9,7 +9,7 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO "suser";
 CREATE TABLE "users" (
     user_id bigserial,
     login varchar(64) NOT NULL UNIQUE,
-    password varchar(32) NOT NULL,
+    password varchar(60) NOT NULL,
     name varchar(64),
     surname varchar(64),
     birthdate date,
