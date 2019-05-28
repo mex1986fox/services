@@ -48,15 +48,17 @@ class Authentificate
                 throw new \Exception("Ошибки в параметрах");
             }
             $db = $this->container['db'];
-            $password = md5($password);
 
-            $q = "select user_id from users where login='{$login}' and password='{$password}';";
+            $q = "select password, user_id from users where login='{$login}';";
             $sth = $db->query($q, \PDO::FETCH_ASSOC);
             $user = $sth->fetch();
             if (empty($user)) {
                 throw new \Exception("Такой пользователь не зарегистрирован.");
             }
 
+            if (!password_verify($password, $user["password"])) {
+                throw new \Exception("Не правильно введен логин или пароль.");
+            }
             return ["status" => "ok",
                 "data" => [
                     "user_id" => $user["user_id"],
@@ -68,6 +70,7 @@ class Authentificate
             return [
                 "status" => "except",
                 "data" => $exceptions,
+                
             ];
         }
     }

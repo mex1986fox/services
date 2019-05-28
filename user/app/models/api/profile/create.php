@@ -49,6 +49,8 @@ class Create
             if (!$vStLen->isValid($password)) {
                 $exceptions["password"] = "Не соответсвует диапозону длины.";
             }
+            // шифруем пароль
+            $password = password_hash($password, PASSWORD_DEFAULT);
             //проверить токин
             //формируем токен
 
@@ -72,7 +74,7 @@ class Create
             $q = "insert into users
                     (login, password )
                 values
-                    ('{$login}',md5('{$password}'))
+                    ('{$login}','{$password}')
                 returning user_id;";
             $sth = $db->query($q, \PDO::FETCH_ASSOC);
             $user = $sth->fetch();
