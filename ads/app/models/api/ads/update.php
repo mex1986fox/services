@@ -1,5 +1,5 @@
 <?php
-namespace App\Models\Api\Post;
+namespace App\Models\Api\Ads;
 
 use \App\Services\Structur\TokenStructur;
 
@@ -18,87 +18,51 @@ class Update
         // обновляет юзеров
         try {
 
-            // передаем параметры в переменные
             $p = $this->request->getQueryParams();
-
             $exceptions = [];
-            if (empty($p["post_id"])) {
-                $exceptions["post_id"] = "Не указан.";
+
+            $valid = $this->container['validators'];
+            $vMethods = $valid->MethodsValidator;
+            // проверяем обязательные для ввода
+            if (!$vMethods->isValid([
+                "emptyParams" => [
+                    ["access_token", $p],
+                    ["ad_id", $p],
+                ]])) {
+                $exceptions = $vMethods->getExceptions();
                 throw new \Exception("Ошибки в параметрах.");
-            }
-            if (!is_numeric($p["post_id"])) {
-                $exceptions["post_id"] = "Не соответствует типу integer.";
-                throw new \Exception("Ошибки в параметрах.");
-            }
-            $postID = $p["post_id"];
-            if (empty($p["access_token"])) {
-                $exceptions["access_token"] = "Не указан.";
+            };
+
+            // проверяем только заполненные параметры
+            if (!$vMethods->isValidFilled([
+                "isAccessToken" => [["access_token", $p["access_token"]]],
+                "isNumeric" => [
+                    ["drive_id", $p["drive_id"]],
+                    ["transmission_id", $p["transmission_id"]],
+                    ["body_id", $p["body_id"]],
+                    ["mileage", $p["mileage"]],
+                    ["fuel_id", $p["fuel_id"]],
+                    ["power", $p["power"]],
+                    ["wheel_id", $p["wheel_id"]],
+                    ["document_id", $p["document_id"]],
+                    ["state_id", $p["state_id"]],
+                    ["exchange_id", $p["exchange_id"]],
+                    ["ad_id", $p["ad_id"]],
+                ],
+                "between" => [
+                    ["mileage", $p["mileage"], ["min" => 0, "max" => 99999999]],
+                    ["power", $p["power"], ["min" => 1, "max" => 9999]],
+                ],
+                "strLen" => [
+                    ["description", $p["description"], ["min" => 0, "max" => 1600]],
+                ]])) {
+                $exceptions = $vMethods->getExceptions();
                 throw new \Exception("Ошибки в параметрах.");
             }
 
-            $accessToken = $p["access_token"];
             $tokenStructur = new TokenStructur($this->container);
             $tokenStructur->setToken($accessToken);
-
-            // проверяем параметры
-            $valid = $this->container['validators'];
-            $tokenSKey = $this->container['services']['token']['key_access_token'];
-            $vToken = $valid->TokenValidator;
-            $vToken->setKey($tokenSKey);
-            if (!$vToken->isValid($tokenStructur)) {
-                $exceptions["access_token"] = "Не действителен.";
-                throw new \Exception("Ошибки в параметрах.");
-            }
-
-            $vStLen = $valid->StringLength;
-            $vStLen->setMin(1);
-            $vStLen->setMax(70);
-            if (isset($p["title"])) {
-                if ($p["title"] == "") {
-                    $exceptions["title"] = "Пустое значение.";
-                }
-                if (!$vStLen->isValid($p["title"])) {
-                    $exceptions["title"] = "Не соответсвует диапозону длины.";
-                }
-            }
-            $vStLen->setMin(1);
-            $vStLen->setMax(1600);
-            if (isset($p["description"])) {
-                if ($p["description"] == "") {
-                    $exceptions["description"] = "Пустое значение.";
-                }
-                if (!$vStLen->isValid($p["description"])) {
-                    $exceptions["description"] = "Не соответсвует диапозону длины.";
-                }
-            }
-            if (isset($p["city_id"])) {
-                if ($p["city_id"] == "") {
-                    $exceptions["city_id"] = "Пустое значение.";
-                }
-                if (!is_numeric($p["city_id"])) {
-                    $exceptions["city_id"] = "Не соответствует типу integer.";
-                }
-            }
-            if (isset($p["model_id"])) {
-                if ($p["model_id"] == "") {
-                    $exceptions["model_id"] = "Пустое значение.";
-                }
-                if (!is_numeric($p["model_id"])) {
-                    $exceptions["model_id"] = "Не соответствует типу integer.";
-                }
-            }
-            if (isset($p["main_photo"])) {
-                if ($p["main_photo"] == "") {
-                    $exceptions["main_photo"] = "Пустое значение.";
-                }
-                $vUri = $valid->Uri;
-                if (!$vUri->isValid($p["main_photo"])) {
-                    $exceptions["main_photo"] = "Не соответствует типу uri.";
-                }
-            }
-            if (!empty($exceptions)) {
-                throw new \Exception("Ошибки в параметрах.");
-            }
+            $profileID = $tokenStructur->getUserID();
 
             // пишем в базу
             // формируем запрос

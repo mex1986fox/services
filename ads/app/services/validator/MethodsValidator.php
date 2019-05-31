@@ -49,6 +49,21 @@ class MethodsValidator extends AbstractValidator
         };
         return true;
     }
+    public function isValidFilled($scheme)
+    {
+        foreach ($scheme as $nameValidator => $valids) {
+            foreach ($valids as $params) {
+                // вызываем методы валидации если значение не пустое
+                if (!empty($params[1])) {
+                    call_user_func_array(array($this, $nameValidator), $params);
+                }
+            }
+        }
+        if (!empty($this->exceptions)) {
+            return false;
+        };
+        return true;
+    }
     public function getExceptions()
     {
         return $this->exceptions;
@@ -98,7 +113,14 @@ class MethodsValidator extends AbstractValidator
         $vStLen->setMin($params["min"]);
         $vStLen->setMax($params["max"]);
         if (!$vStLen->isValid($value)) {
-            $this->pushExc($name, "Символов от " . $params["min"] . " до " . $params["max"]);
+            $this->pushExc($name, "Допустимое количество знаков от " . $params["min"] . " до " . $params["max"]);
+        }
+
+    }
+    public function between($name, $value, $params = ["min" => 0, "max" => 0])
+    {
+        if ($value < $params["min"] || $value > $params["max"]) {
+            $this->pushExc($name, "Допустимое значение от " . $params["min"] . " до " . $params["max"]);
         }
 
     }

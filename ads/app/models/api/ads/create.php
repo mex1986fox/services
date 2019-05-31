@@ -48,9 +48,9 @@ class Create
                     ["model_id", $modelID],
                     ["year", $year],
                     ["price", $price]],
-                "strLen" => [
-                    ["price", $year, ["min" => 3, "max" => 9]],
-                    ["year", $year, ["min" => 4, "max" => 4]],
+                "between" => [
+                    ["price", $price, ["min" => 500, "max" => 999999999]],
+                    ["year", $year, ["min" => 1936, "max" => date("Y")]],
                 ]])) {
                 $exceptions = $vMethods->getExceptions();
                 throw new \Exception("Ошибки в параметрах.");
