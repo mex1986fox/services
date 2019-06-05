@@ -54,7 +54,10 @@ class MethodsValidator extends AbstractValidator
         foreach ($scheme as $nameValidator => $valids) {
             foreach ($valids as $params) {
                 // вызываем методы валидации если значение не пустое
-                if (!empty($params[1])) {
+
+                if (!empty($params[1][$params[0]])) {
+                    $val=$params[1][$params[0]];
+                    $params[1]=$val;
                     call_user_func_array(array($this, $nameValidator), $params);
                 }
             }
@@ -108,12 +111,26 @@ class MethodsValidator extends AbstractValidator
     }
     public function strLen($name, $value, $params = ["min" => 0, "max" => 0])
     {
-
         $vStLen = $this->validators->StringLength;
         $vStLen->setMin($params["min"]);
         $vStLen->setMax($params["max"]);
         if (!$vStLen->isValid($value)) {
             $this->pushExc($name, "Допустимое количество знаков от " . $params["min"] . " до " . $params["max"]);
+        }
+    }
+    public function uri($name, $value)
+    {
+        $v = $this->validators->Uri;
+        $v->setAllowRelative(false);
+        $v->setAllowAbsolute(true);
+        if (!$v->isValid($value)) {
+            $this->pushExc($name, "Не соответствует типу Uri");
+        }
+    }
+    public function toFloat($name, $value)
+    {
+        if (!filter_var($value, FILTER_VALIDATE_FLOAT)) {
+            $this->pushExc($name, " Не соответствует типу Float");
         }
 
     }

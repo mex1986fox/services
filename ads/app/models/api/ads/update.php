@@ -15,7 +15,7 @@ class Update
     }
     public function run()
     {
-        // обновляет юзеров
+        // обновляет объявление
         try {
 
             $p = $this->request->getQueryParams();
@@ -35,42 +35,58 @@ class Update
 
             // проверяем только заполненные параметры
             if (!$vMethods->isValidFilled([
-                "isAccessToken" => [["access_token", $p["access_token"]]],
+                "isAccessToken" => [["access_token", $p]],
                 "isNumeric" => [
-                    ["drive_id", $p["drive_id"]],
-                    ["transmission_id", $p["transmission_id"]],
-                    ["body_id", $p["body_id"]],
-                    ["mileage", $p["mileage"]],
-                    ["fuel_id", $p["fuel_id"]],
-                    ["power", $p["power"]],
-                    ["wheel_id", $p["wheel_id"]],
-                    ["document_id", $p["document_id"]],
-                    ["state_id", $p["state_id"]],
-                    ["exchange_id", $p["exchange_id"]],
-                    ["ad_id", $p["ad_id"]],
+                    ["drive_id", $p],
+                    ["transmission_id", $p],
+                    ["body_id", $p],
+                    ["mileage", $p],
+                    ["fuel_id", $p],
+                    ["power", $p],
+                    ["wheel_id", $p],
+                    ["document_id", $p],
+                    ["state_id", $p],
+                    ["exchange_id", $p],
+                    ["ad_id", $p],
                 ],
                 "between" => [
-                    ["mileage", $p["mileage"], ["min" => 0, "max" => 99999999]],
-                    ["power", $p["power"], ["min" => 1, "max" => 9999]],
+                    ["mileage", $p, ["min" => 0, "max" => 99999999]],
+                    ["power", $p, ["min" => 1, "max" => 9999]],
+                ],
+                "toFloat" => [
+                    ["volume", $p],
+                ],
+                "uri"=>[
+                    ["main_photo", $p],
                 ],
                 "strLen" => [
-                    ["description", $p["description"], ["min" => 0, "max" => 1600]],
+                    ["description", $p, ["min" => 0, "max" => 1600]],
                 ]])) {
                 $exceptions = $vMethods->getExceptions();
                 throw new \Exception("Ошибки в параметрах.");
             }
 
             $tokenStructur = new TokenStructur($this->container);
-            $tokenStructur->setToken($accessToken);
+            $tokenStructur->setToken( $p["access_token"]);
             $profileID = $tokenStructur->getUserID();
 
-            // пишем в базу
             // формируем запрос
             $qSet = "";
-            $qSet = $qSet . (empty($p["title"]) ? "" : " title='{$p["title"]}',");
+            $qSet = $qSet . (empty($p["drive_id"]) ? "" : " drive_id={$p["drive_id"]},");
+            $qSet = $qSet . (empty($p["transmission_id"]) ? "" : " transmission_id={$p["transmission_id"]},");
+            $qSet = $qSet . (empty($p["body_id"]) ? "" : " body_id={$p["body_id"]},");
+            $qSet = $qSet . (empty($p["mileage"]) ? "" : " mileage={$p["mileage"]},");
+
+            $qSet = $qSet . (empty($p["fuel_id"]) ? "" : " fuel_id={$p["fuel_id"]},");
+            $qSet = $qSet . (empty($p["power"]) ? "" : " power={$p["power"]},");
+            $qSet = $qSet . (empty($p["volume"]) ? "" : " volume={$p["volume"]},");
+
+            $qSet = $qSet . (empty($p["wheel_id"]) ? "" : " wheel_id={$p["wheel_id"]},");
+            $qSet = $qSet . (empty($p["document_id"]) ? "" : " document_id={$p["document_id"]},");
+            $qSet = $qSet . (empty($p["state_id"]) ? "" : " state_id={$p["state_id"]},");
+            $qSet = $qSet . (empty($p["exchange_id"]) ? "" : " exchange_id={$p["exchange_id"]},");
             $qSet = $qSet . (empty($p["description"]) ? "" : " description='{$p["description"]}',");
-            $qSet = $qSet . (empty($p["city_id"]) ? "" : " city_id='{$p["city_id"]}',");
-            $qSet = $qSet . (empty($p["model_id"]) ? "" : " model_id='{$p["model_id"]}',");
+
             if (!empty($p["main_photo"])) {
                 $qSet = $qSet . ($p["main_photo"] == "null" ? " main_photo=null," : " main_photo='{$p["main_photo"]}',");
             }
@@ -78,14 +94,16 @@ class Update
             if (empty($qSet)) {
                 throw new \Exception("Запрос пустой не имеет параметров.");
             }
-            $q = "update posts set {$qSet} where user_id={$tokenStructur->getUserID()} and post_id={$postID} RETURNING *;";
+
+            // пишем в базу
+            $q = "update ads set {$qSet} where user_id={$profileID} and ad_id={$p["ad_id"]} RETURNING *;";
             $db = $this->container['db'];
-            $post = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-            if (empty($post["user_id"])) {
-                throw new \Exception("Такой пост не существует.");
+            $ad = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            if (empty($ad["user_id"])) {
+                throw new \Exception("Такое объявление не существует.");
             }
             return ["status" => "ok",
-                "data" => ["post" => $post],
+                "data" => ["ad" => $ad],
             ];
 
         } catch (RuntimeException | \Exception $e) {
