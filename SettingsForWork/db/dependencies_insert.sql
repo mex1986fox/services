@@ -1,6 +1,6 @@
 INSERT INTO types(name, name_url)
 VALUES
-('Легковые','car');
+('легковые','car');
 
 INSERT INTO drives(type_id, name, name_url)
 VALUES 
@@ -8,13 +8,13 @@ VALUES
 (1,'задний','rear'),
 (1,'4WD','4WD');
 
-INSERT INTO fuels(type_id, name, name_url)
+INSERT INTO fuels(fuel_id, type_id, name, name_url)
 VALUES 
-(1,'Бензин','benzin'),
-(1,'Дизель','dizel'),
-(1,'Электро','elektro'),
-(1,'Гибрид','gibrid'),
-(1,'ГБО','gbo');
+(1, 1,'бензин','benzin'),
+(2, 1,'дизель','dizel'),
+(3, 1,'электро','elektro'),
+(4, 1,'гибрид','gibrid'),
+(5, 1,'ГБО','gbo');
 INSERT INTO volums(type_id, value)
 VALUES 
 (1, 0.7),
