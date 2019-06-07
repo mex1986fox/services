@@ -56,7 +56,7 @@ class Update
                 "toFloat" => [
                     ["volume", $p],
                 ],
-                "uri"=>[
+                "uri" => [
                     ["main_photo", $p],
                 ],
                 "strLen" => [
@@ -67,7 +67,7 @@ class Update
             }
 
             $tokenStructur = new TokenStructur($this->container);
-            $tokenStructur->setToken( $p["access_token"]);
+            $tokenStructur->setToken($p["access_token"]);
             $profileID = $tokenStructur->getUserID();
 
             // формируем запрос
@@ -102,8 +102,32 @@ class Update
             if (empty($ad["user_id"])) {
                 throw new \Exception("Такое объявление не существует.");
             }
+            $q =
+                " select ads.user_id as user_id, ads.ad_id as ad_id, ads.date_create, ads.description, " .
+                " ads.main_photo, ads.year as year, price::numeric(10,0) as price, " .
+                " mileage, power, volume, wheel_id, document_id, state_id, exchange_id, " .
+                " cities.city_id, cities.name as city, subjects.subject_id, subjects.name as subject, " .
+                " countries.country_id, countries.name as country, " .
+                " models.model_id, models.name as model, brands.brand_id, brands.name as brand, " .
+                " types.type_id, types.name as type,  " .
+                " votes.likes as likes, votes.dislikes as dislikes, " .
+                " drives.name as drive, transmissions.name as transmission, bodies.name as body, fuels.name as fuel " .
+                " from ads " .
+                " LEFT JOIN cities ON cities.city_id = ads.city_id " .
+                " LEFT JOIN subjects ON subjects.subject_id = cities.subject_id " .
+                " LEFT JOIN countries ON countries.country_id = cities.country_id " .
+                " LEFT JOIN models ON models.model_id = ads.model_id " .
+                " LEFT JOIN brands ON brands.brand_id = models.brand_id " .
+                " LEFT JOIN types ON types.type_id = models.type_id " .
+                " LEFT JOIN votes ON votes.user_id = ads.user_id  and votes.ad_id = ads.ad_id " .
+                " LEFT JOIN drives ON drives.drive_id = ads.drive_id " .
+                " LEFT JOIN transmissions ON transmissions.transmission_id = ads.transmission_id " .
+                " LEFT JOIN bodies ON bodies.body_id = ads.body_id " .
+                " LEFT JOIN fuels ON fuels.fuel_id = ads.fuel_id " .
+                " WHERE ads.user_id={$profileID} and ads.ad_id={$ad["ad_id"]}";
+            $adSelect = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
             return ["status" => "ok",
-                "data" => ["ad" => $ad],
+                "data" => ["ad" => $adSelect],
             ];
 
         } catch (RuntimeException | \Exception $e) {

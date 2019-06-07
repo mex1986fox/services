@@ -27,7 +27,7 @@ class Create
                 "emptyParams" => [
                     ["access_token", $p],
                     ["user_id", $p],
-                    ["post_id", $p],
+                    ["ad_id", $p],
                 ],
                 "isSetParams" => [
                     ["vote", $p],
@@ -38,14 +38,14 @@ class Create
 
             $accessToken = $p["access_token"];
             $userID = $p["user_id"];
-            $postID = $p["post_id"];
+            $adID = $p["ad_id"];
             $vote = $p["vote"];
 
             // проверяем параметры
             if (!$vMethods->isValid([
                 "isAccessToken" => [["access_token", $accessToken]],
                 "isNumeric" => [
-                    ["post_id", $postID],
+                    ["ad_id", $adID],
                     ["user_id", $userID]],
                 "isBool" => [["vote", $vote]],
             ])) {
@@ -59,27 +59,27 @@ class Create
 
             $db = $this->container['db'];
             // формируем запрос на проверку такого поста
-            $q = "select post_id from posts where user_id={$userID} and post_id={$postID}";
+            $q = "select ad_id from ads where user_id={$userID} and ad_id={$adID}";
             $fCheckPost = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
             //если нет поста
-            if (empty($fCheckPost["post_id"])) {
+            if (empty($fCheckPost["ad_id"])) {
                 throw new \Exception("Такого поста нет.");
             }
             // формируем запрос на проверку проголосовавших
-            $q = "select post_id from votes where user_id={$userID} and post_id={$postID} and profiles @>'{{$profileID}}'::integer[]";
+            $q = "select ad_id from votes where user_id={$userID} and ad_id={$adID} and profiles @>'{{$profileID}}'::integer[]";
             $fCheckVote = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
             //если голосовал
-            if (!empty($fCheckVote["post_id"])) {
+            if (!empty($fCheckVote["ad_id"])) {
                 throw new \Exception("Пользователь уже голосовал");
             }
             // формируем запрос на добавление голоса
             $qLike = ($vote == true ? 1 : 0);
             $qDisLike = ($vote == false ? 1 : 0);
             $q =
-                " insert into votes (user_id, post_id, likes, dislikes, profiles) " .
-                " values ({$userID}, {$postID}, {$qLike}, {$qDisLike}, '{{$profileID}}'::integer[]) " .
-                " on conflict (user_id, post_id) do " .
-                " update set user_id={$userID}, post_id={$postID}, " .
+                " insert into votes (user_id, ad_id, likes, dislikes, profiles) " .
+                " values ({$userID}, {$adID}, {$qLike}, {$qDisLike}, '{{$profileID}}'::integer[]) " .
+                " on conflict (user_id, ad_id) do " .
+                " update set user_id={$userID}, ad_id={$adID}, " .
                 " likes=votes.likes+{$qLike}, dislikes=votes.dislikes+{$qDisLike}, " .
                 " profiles=votes.profiles||{$profileID}";
             $db->query($q, \PDO::FETCH_ASSOC)->fetch();
