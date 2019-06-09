@@ -18,45 +18,32 @@ class Show
             // передаем параметры в переменные
             $p = $this->request->getQueryParams();
             $exceptions = [];
-
-            $sortID = empty($p["sort_id"]) ? 0 : $p["sort_id"];
             //для пагинации от какого id юзера шагать при выборке
-            $stepFrom = empty($p["step_from"]) ? "" : $p["step_from"];
-
-            $postID = empty($p["ad_id"]) ? "" : $p["ad_id"];
-            $title = empty($p["title"]) ? "" : $p["title"];
-            // $name = empty($p["name"]) ? "" : $p["name"];
-            // $surname = empty($p["surname"]) ? "" : $p["surname"];
+            $sortID = empty($p["sort_id"]) ? 0 : $p["sort_id"];
             $countriesID = empty($p["countries_id"]) ? "" : array_diff($p["countries_id"], array(''));
             $subjectsID = empty($p["subjects_id"]) ? "" : array_diff($p["subjects_id"], array(''));
             $citiesID = empty($p["cities_id"]) ? "" : array_diff($p["cities_id"], array(''));
-
             $modelsID = empty($p["models_id"]) ? "" : array_diff($p["models_id"], array(''));
             $brandsID = empty($p["brands_id"]) ? "" : array_diff($p["brands_id"], array(''));
             $typesID = empty($p["types_id"]) ? "" : array_diff($p["types_id"], array(''));
+            $bodyID = empty($p["body_id"]) ? "" : array_diff($p["body_id"], array(''));
+            $transmissionID = empty($p["transmission_id"]) ? "" : array_diff($p["transmission_id"], array(''));
+            $driveID = empty($p["drive_id"]) ? "" : array_diff($p["drive_id"], array(''));
+            $mileage = empty($p["mileage"]) ? 0 : str_replace(" ", "", $p["mileage"]);
+            $mileage2 = empty($p["mileage2"]) ? 0 : str_replace(" ", "", $p["mileage2"]);
             // проверяем параметры
-            // if (empty($sortID)) {
-            //     $exceptions["sort_id"] = "Не указан.";
-            //     throw new \Exception("Ошибки в параметрах.");
-            // }
-            // if (!is_numeric($sortID)) {
-            //     $exceptions["sort_id"] = "Не соответствует типу integer.";
-            //     throw new \Exception("Ошибки в параметрах.");
-            // }
-            // if ($sortID < 1 || $sortID > 2) {
-            //     $exceptions["sort_id"] = "Не соответствует диапазону.";
-            //     throw new \Exception("Ошибки в параметрах.");
-            // }
+            // проверяем параметры
+
             //формируем условия сортировки
             $qSort = "";
             $qWhere = "";
             $qWherePag = "";
-            if (!empty($stepFrom)) {
+            if (!empty($p["step_from"])) {
                 $db = $this->container['db'];
                 $q = "select ad_id, date_create, cities.name as city, models.name as model from ads"
                     . " LEFT JOIN cities ON cities.city_id = ads.city_id "
                     . " LEFT JOIN models ON models.model_id = ads.model_id "
-                    . " where ad_id=" . $stepFrom;
+                    . " where ad_id=" . $p["step_from"];
                 $sfBlog = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
                 if (empty($sfBlog)) {
                     $exceptions["step_from"] = "Не найден в системе.";
@@ -96,31 +83,35 @@ class Show
             }
 
             // строим запрос выборки
-            $qWhere = $qWhere . (empty($postID) ? "" : " ad_id=" . $postID . " and ");
-
-            $qWhere = $qWhere . (empty($title) ? "" : " ads.title ILIKE '%" . $title . "%' and ");
+            $qWhere = $qWhere . (empty($p["ad_id"]) ? "" : " ad_id=" . $p["ad_id"] . " and ");
 
             //для местоположения
-            if (!empty($citiesID) || !empty($subjectsID) || !empty($countriesID)) {
-                $qWhere = $qWhere . " (";
-            } //  для страны
-            $qWhere = $qWhere . (empty($countriesID) ? "" : " countries.country_id in (" . implode(', ', $countriesID) . ") or ");
-            //  для региона
-            $qWhere = $qWhere . (empty($subjectsID) ? "" : " subjects.subject_id in (" . implode(', ', $subjectsID) . ") or ");
-            //  для города
-            $qWhere = $qWhere . (empty($citiesID) ? "" : " cities.city_id in (" . implode(', ', $citiesID) . ") or ");
-            $qWhere = $qWhere . (empty($modelsID) ? "" : " models.model_id in (" . implode(', ', $modelsID) . ") or ");
-            $qWhere = $qWhere . (empty($brandsID) ? "" : " brands.brand_id in (" . implode(', ', $brandsID) . ") or ");
-            $qWhere = $qWhere . (empty($typesID) ? "" : " types.type_id in (" . implode(', ', $typesID) . ") or ");
-            if (!empty($citiesID) || !empty($subjectsID) || !empty($countriesID)) {
-                $qWhere = rtrim($qWhere, ' or ') . ") and ";
+            $qWhereLocat = "";
+            $qWhereLocat .= empty($countriesID) ? "" : " countries.country_id in (" . implode(', ', $p["countries_id"]) . ") or ";
+            $qWhereLocat .= empty($subjectsID) ? "" : " subjects.subject_id in (" . implode(', ', $p["subjects_id"]) . ") or ";
+            $qWhereLocat .= empty($citiesID) ? "" : " cities.city_id in (" . implode(', ', $p["cities_id"]) . ") or ";
+            if (!empty($qWhereLocat)) {
+                $qWhere .= " (" . rtrim($qWhereLocat, ' or ') . ") and ";
             }
+            //для транспорта
+            $qWhereTrans = "";
+            $qWhereTrans .= empty($modelsID) ? "" : " models.model_id in (" . implode(', ', $p["models_id"]) . ") or ";
+            $qWhereTrans .= empty($brandsID) ? "" : " brands.brand_id in (" . implode(', ', $p["brands_id"]) . ") or ";
+            $qWhereTrans .= empty($typesID) ? "" : " types.type_id in (" . implode(', ', $p["types_id"]) . ") or ";
+            if (!empty($qWhereTrans)) {
+                $qWhere .= " (" . rtrim($qWhereTrans, ' or ') . ") and ";
+            }
+            //прочее
+            $qWhere .= empty($driveID) ? "" : " drives.drive_id in (" . implode(', ', $p["drive_id"]) . ") and ";
+            $qWhere .= empty($transmissionID) ? "" : " transmissions.transmission_id in (" . implode(', ', $p["transmission_id"]) . ") and ";
+            $qWhere .= empty($bodyID) ? "" : " bodies.body_id in (" . implode(', ', $p["body_id"]) . ") and ";
+            $qWhere .= empty($mileage) ? "" : " ads.mileage>={$mileage} and ";
+            $qWhere .= empty($mileage2) ? "" : " ads.mileage<={$mileage2} and ";
 
             $qWhere = $qWhere . $qWherePag;
             $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' or ');
             $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' and ');
             $qWhere = (empty($qWhere) ? "" : " where ") . $qWhere;
-
             $qSort = empty($qSort) ? "" : rtrim($qSort, ', ');
             $qSort = (empty($qSort) ? "" : " ORDER BY ") . $qSort;
             // пишем в базу

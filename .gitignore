@@ -1,6 +1,10 @@
 captcha/vendor
 post/vendor
 post_photo/vendor
+post_photo/public/photos
+ads/vendor
+ads_photo/vendor
+ads_photo/public/photos
 user/vendor
 user_photo/vendor
 user_photo/public/photos
