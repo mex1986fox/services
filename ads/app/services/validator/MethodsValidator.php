@@ -54,10 +54,9 @@ class MethodsValidator extends AbstractValidator
         foreach ($scheme as $nameValidator => $valids) {
             foreach ($valids as $params) {
                 // вызываем методы валидации если значение не пустое
-
-                if (!empty($params[1][$params[0]])) {
-                    $val=$params[1][$params[0]];
-                    $params[1]=$val;
+                if (isset($params[1][$params[0]])) {
+                    $val = $params[1][$params[0]];
+                    $params[1] = $val;
                     call_user_func_array(array($this, $nameValidator), $params);
                 }
             }
@@ -78,11 +77,42 @@ class MethodsValidator extends AbstractValidator
             $this->exceptions[$name] = $description;
         }
     }
+    public function emptyParamsFilled($name, $p)
+    {
 
+        if (empty($p)) {
+            $this->pushExc($name, "Пустое значение.");
+        }
+        if (!empty($p) && is_array($p)) {
+
+            foreach ($p as $key => $value) {
+                $fEmp = true;
+                if (!empty($value)) {
+                    $fEmp = false;
+                }
+                if ($fEmp == true) {
+                    $this->pushExc($name, "Array с пустыми значениями");
+                }
+            }
+        }
+    }
     public function emptyParams($name, $p)
     {
+
         if (empty($p[$name])) {
             $this->pushExc($name, "Пустое значение.");
+        }
+        if (!empty($p[$name]) && is_array($p[$name])) {
+
+            foreach ($p[$name] as $key => $value) {
+                $fEmp = true;
+                if (!empty($value)) {
+                    $fEmp = false;
+                }
+                if ($fEmp == true) {
+                    $this->pushExc($name, "Array с пустыми значениями");
+                }
+            }
         }
     }
     public function isSetParams($name, $p)

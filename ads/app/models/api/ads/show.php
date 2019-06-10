@@ -20,19 +20,32 @@ class Show
             $exceptions = [];
             //для пагинации от какого id юзера шагать при выборке
             $sortID = empty($p["sort_id"]) ? 0 : $p["sort_id"];
-            $countriesID = empty($p["countries_id"]) ? "" : array_diff($p["countries_id"], array(''));
-            $subjectsID = empty($p["subjects_id"]) ? "" : array_diff($p["subjects_id"], array(''));
-            $citiesID = empty($p["cities_id"]) ? "" : array_diff($p["cities_id"], array(''));
-            $modelsID = empty($p["models_id"]) ? "" : array_diff($p["models_id"], array(''));
-            $brandsID = empty($p["brands_id"]) ? "" : array_diff($p["brands_id"], array(''));
-            $typesID = empty($p["types_id"]) ? "" : array_diff($p["types_id"], array(''));
-            $bodyID = empty($p["body_id"]) ? "" : array_diff($p["body_id"], array(''));
-            $transmissionID = empty($p["transmission_id"]) ? "" : array_diff($p["transmission_id"], array(''));
-            $driveID = empty($p["drive_id"]) ? "" : array_diff($p["drive_id"], array(''));
-            $mileage = empty($p["mileage"]) ? 0 : str_replace(" ", "", $p["mileage"]);
-            $mileage2 = empty($p["mileage2"]) ? 0 : str_replace(" ", "", $p["mileage2"]);
-            // проверяем параметры
-            // проверяем параметры
+
+            // $p["models_id"] = empty($p["models_id"]) ? "" : array_diff($p["models_id"], array(''));
+
+            $valid = $this->container['validators'];
+            $vMethods = $valid->MethodsValidator;
+            // проверяем обязательные для ввода
+
+            // проверяем только заполненные параметры
+            if (!$vMethods->isValidFilled([
+                "emptyParamsFilled" => [
+                    ["countries_id", $p],
+                    ["subjects_id", $p],
+                    ["cities_id", $p],
+                    ["models_id", $p],
+                    ["brands_id", $p],
+                    ["types_id", $p],
+                    ["drive_id", $p],
+                    ["transmission_id", $p],
+                    ["body_id", $p],
+                    ["fuel_id", $p],
+                    ["state_id", $p],
+                ],
+            ])) {
+                $exceptions = $vMethods->getExceptions();
+                throw new \Exception("Ошибки в параметрах.");
+            }
 
             //формируем условия сортировки
             $qSort = "";
@@ -87,26 +100,37 @@ class Show
 
             //для местоположения
             $qWhereLocat = "";
-            $qWhereLocat .= empty($countriesID) ? "" : " countries.country_id in (" . implode(', ', $p["countries_id"]) . ") or ";
-            $qWhereLocat .= empty($subjectsID) ? "" : " subjects.subject_id in (" . implode(', ', $p["subjects_id"]) . ") or ";
-            $qWhereLocat .= empty($citiesID) ? "" : " cities.city_id in (" . implode(', ', $p["cities_id"]) . ") or ";
+            $qWhereLocat .= empty($p["countries_id"]) ? "" : " countries.country_id in (" . implode(', ', $p["countries_id"]) . ") or ";
+            $qWhereLocat .= empty($p["subjects_id"]) ? "" : " subjects.subject_id in (" . implode(', ', $p["subjects_id"]) . ") or ";
+            $qWhereLocat .= empty($p["cities_id"]) ? "" : " cities.city_id in (" . implode(', ', $p["cities_id"]) . ") or ";
             if (!empty($qWhereLocat)) {
                 $qWhere .= " (" . rtrim($qWhereLocat, ' or ') . ") and ";
             }
             //для транспорта
             $qWhereTrans = "";
-            $qWhereTrans .= empty($modelsID) ? "" : " models.model_id in (" . implode(', ', $p["models_id"]) . ") or ";
-            $qWhereTrans .= empty($brandsID) ? "" : " brands.brand_id in (" . implode(', ', $p["brands_id"]) . ") or ";
-            $qWhereTrans .= empty($typesID) ? "" : " types.type_id in (" . implode(', ', $p["types_id"]) . ") or ";
+            $qWhereTrans .= empty($p["models_id"]) ? "" : " models.model_id in (" . implode(', ', $p["models_id"]) . ") or ";
+            $qWhereTrans .= empty($p["brands_id"]) ? "" : " brands.brand_id in (" . implode(', ', $p["brands_id"]) . ") or ";
+            $qWhereTrans .= empty($p["types_id"]) ? "" : " types.type_id in (" . implode(', ', $p["types_id"]) . ") or ";
             if (!empty($qWhereTrans)) {
                 $qWhere .= " (" . rtrim($qWhereTrans, ' or ') . ") and ";
             }
             //прочее
-            $qWhere .= empty($driveID) ? "" : " drives.drive_id in (" . implode(', ', $p["drive_id"]) . ") and ";
-            $qWhere .= empty($transmissionID) ? "" : " transmissions.transmission_id in (" . implode(', ', $p["transmission_id"]) . ") and ";
-            $qWhere .= empty($bodyID) ? "" : " bodies.body_id in (" . implode(', ', $p["body_id"]) . ") and ";
-            $qWhere .= empty($mileage) ? "" : " ads.mileage>={$mileage} and ";
-            $qWhere .= empty($mileage2) ? "" : " ads.mileage<={$mileage2} and ";
+            $qWhere .= empty($p["drive_id"]) ? "" : " drives.drive_id in (" . implode(', ', $p["drive_id"]) . ") and ";
+            $qWhere .= empty($p["transmission_id"]) ? "" : " transmissions.transmission_id in (" . implode(', ', $p["transmission_id"]) . ") and ";
+            $qWhere .= empty($p["body_id"]) ? "" : " bodies.body_id in (" . implode(', ', $p["body_id"]) . ") and ";
+            $qWhere .= empty($p["mileage"]) ? "" : " ads.mileage>={$p["mileage"]} and ";
+            $qWhere .= empty($p["mileage2"]) ? "" : " ads.mileage<={$p["mileage2"]} and ";
+            //двигатель
+            $qWhere .= empty($p["fuel_id"]) ? "" : " fuels.fuel_id in (" . implode(', ', $p["fuel_id"]) . ") and ";
+            $qWhere .= empty($p["power"]) ? "" : " ads.power>={$p["power"]} and ";
+            $qWhere .= empty($p["power2"]) ? "" : " ads.power<={$p["power2"]} and ";
+            $qWhere .= empty($p["volume"]) ? "" : " ads.volume>={$p["volume"]} and ";
+            $qWhere .= empty($p["volume2"]) ? "" : " ads.volume<={$p["volume2"]} and ";
+
+            $qWhere .= empty($wheelID) ? "" : " ads.wheel_id={$wheelID} and ";
+            $qWhere .= empty($documentID) ? "" : " ads.document_id={$documentID} and ";
+            $qWhere .= empty($stateID) ? "" : " ads.state_id in (" . implode(', ', $p["state_id"]) . ") and ";
+            $qWhere .= empty($exchangeID) ? "" : " ads.exchange_id={$exchangeID} and ";
 
             $qWhere = $qWhere . $qWherePag;
             $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' or ');
