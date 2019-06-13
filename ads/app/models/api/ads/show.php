@@ -106,7 +106,12 @@ class Show
 
                 case 9:
                     $qSort = $qSort . "ads.mileage DESC, ads.ad_id DESC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.mileage, ads.ad_id)<(" . (empty($sfBlog["mileage"]) ? 'null' : '\'' . $sfBlog["mileage"] . '\'') . ", " . $sfBlog["ad_id"] . ") and ");
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.mileage, ads.ad_id)<('" . $sfBlog["mileage"] . "', " . $sfBlog["ad_id"] . ") and ");
+
+                case 10:
+                    $qSort = $qSort . "ads.mileage ASC, ads.ad_id ASC, ";
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.mileage, ads.ad_id)>('" . $sfBlog["mileage"] . "', " . $sfBlog["ad_id"] . ") and ");
+
                     break;
 
             }
@@ -156,7 +161,7 @@ class Show
             $qSort = (empty($qSort) ? "" : " ORDER BY ") . $qSort;
             // пишем в базу
             $db = $this->container['db'];
-            echo $q =
+            $q =
                 " select ads.user_id as user_id, ads.ad_id as ad_id, ads.date_create, ads.description, " .
                 " ads.main_photo, ads.year as year, price::numeric(10,0) as price, " .
                 " mileage, power, volume, wheel_id, document_id, state_id, exchange_id, " .
