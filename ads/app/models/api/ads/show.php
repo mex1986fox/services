@@ -53,11 +53,13 @@ class Show
             $qWherePag = "";
             if (!empty($p["step_from"])) {
                 $db = $this->container['db'];
-                $q = "select ad_id, date_create, cities.name as city, models.name as model from ads"
+                $q = "select mileage, price, ad_id, date_create, cities.name as city, models.name as model from ads"
                     . " LEFT JOIN cities ON cities.city_id = ads.city_id "
                     . " LEFT JOIN models ON models.model_id = ads.model_id "
                     . " where ad_id=" . $p["step_from"];
+
                 $sfBlog = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+                // var_dump($sfBlog);
                 if (empty($sfBlog)) {
                     $exceptions["step_from"] = "Не найден в системе.";
                     throw new \Exception("Ошибки в параметрах.");
@@ -93,6 +95,20 @@ class Show
                     $qSort = $qSort . "models.name desc, ads.ad_id desc, ";
                     $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (models.name, ads.ad_id)<('" . $sfBlog["model"] . "', " . $sfBlog["ad_id"] . ") and ");
                     break;
+                case 7:
+                    $qSort = $qSort . "ads.price DESC, ads.ad_id DESC, ";
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.price, ads.ad_id)<('" . $sfBlog["price"] . "', " . $sfBlog["ad_id"] . ") and ");
+                    break;
+                case 8:
+                    $qSort = $qSort . "ads.price ASC, ads.ad_id ASC, ";
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.price, ads.ad_id)>('" . $sfBlog["price"] . "', " . $sfBlog["ad_id"] . ") and ");
+                    break;
+
+                case 9:
+                    $qSort = $qSort . "ads.mileage DESC, ads.ad_id DESC, ";
+                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.mileage, ads.ad_id)<(" . (empty($sfBlog["mileage"]) ? 'null' : '\'' . $sfBlog["mileage"] . '\'') . ", " . $sfBlog["ad_id"] . ") and ");
+                    break;
+
             }
 
             // строим запрос выборки
@@ -140,7 +156,7 @@ class Show
             $qSort = (empty($qSort) ? "" : " ORDER BY ") . $qSort;
             // пишем в базу
             $db = $this->container['db'];
-            $q =
+            echo $q =
                 " select ads.user_id as user_id, ads.ad_id as ad_id, ads.date_create, ads.description, " .
                 " ads.main_photo, ads.year as year, price::numeric(10,0) as price, " .
                 " mileage, power, volume, wheel_id, document_id, state_id, exchange_id, " .
