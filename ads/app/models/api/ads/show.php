@@ -18,29 +18,41 @@ class Show
             // передаем параметры в переменные
             $p = $this->request->getQueryParams();
             $exceptions = [];
-            //для пагинации от какого id юзера шагать при выборке
+            $limit = 5;
+            $qSort = "";
+            $qWhere = "";
+            //для пагинации
             $sortID = empty($p["sort_id"]) ? 0 : $p["sort_id"];
+            $page = empty($p["page"]) ? 1 : $p["page"];
 
-            // $p["models_id"] = empty($p["models_id"]) ? "" : array_diff($p["models_id"], array(''));
-
+            // проверяем параметры
             $valid = $this->container['validators'];
             $vMethods = $valid->MethodsValidator;
-            // проверяем обязательные для ввода
-
             // проверяем только заполненные параметры
             if (!$vMethods->isValidFilled([
                 "emptyParamsFilled" => [
-                    ["countries_id", $p],
-                    ["subjects_id", $p],
-                    ["cities_id", $p],
-                    ["models_id", $p],
-                    ["brands_id", $p],
-                    ["types_id", $p],
-                    ["drive_id", $p],
-                    ["transmission_id", $p],
-                    ["body_id", $p],
-                    ["fuel_id", $p],
-                    ["state_id", $p],
+                    ["ad_id", $p], ["ads_id", $p],
+                    ["sort_id", $p], ["page", $p],
+                    ["countries_id", $p], ["subjects_id", $p], ["cities_id", $p],
+                    ["models_id", $p], ["brands_id", $p], ["types_id", $p],
+                    ["drive_id", $p], ["transmission_id", $p], ["body_id", $p], ["mileage", $p], ["mileage2", $p],
+                    ["fuel_id", $p], ["power", $p], ["power2", $p], ["volume", $p], ["volume2", $p],
+                    ["wheel_id", $p], ["document_id", $p], ["state_id", $p], ["exchange_id", $p],
+                ],
+                "isInt" => [
+                    ["ad_id", $p],
+                    ["sort_id", $p], ["page", $p],
+                    ["countries_id", $p], ["subjects_id", $p], ["cities_id", $p],
+                    ["models_id", $p], ["brands_id", $p], ["types_id", $p],
+                    ["drive_id", $p], ["transmission_id", $p], ["body_id", $p], ["mileage", $p], ["mileage2", $p],
+                    ["fuel_id", $p], ["power", $p], ["power2", $p],
+                    ["wheel_id", $p], ["document_id", $p], ["state_id", $p], ["exchange_id", $p],
+                ],
+                "isArray" => [
+                    ["ads_id", $p],
+                ],
+                "isFloat" => [
+                    ["volume", $p], ["volume2", $p],
                 ],
             ])) {
                 $exceptions = $vMethods->getExceptions();
@@ -48,77 +60,23 @@ class Show
             }
 
             //формируем условия сортировки
-            $qSort = "";
-            $qWhere = "";
-            $qWherePag = "";
-            if (!empty($p["step_from"])) {
-                $db = $this->container['db'];
-                $q = "select mileage, price, ad_id, date_create, cities.name as city, models.name as model from ads"
-                    . " LEFT JOIN cities ON cities.city_id = ads.city_id "
-                    . " LEFT JOIN models ON models.model_id = ads.model_id "
-                    . " where ad_id=" . $p["step_from"];
-
-                $sfBlog = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-                // var_dump($sfBlog);
-                if (empty($sfBlog)) {
-                    $exceptions["step_from"] = "Не найден в системе.";
-                    throw new \Exception("Ошибки в параметрах.");
-                }
-            }
-
-            switch ($sortID) {
-                case 0:
-                    $qSort = $qSort . "ads.date_create DESC, ads.ad_id DESC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.date_create, ads.ad_id)<('" . $sfBlog["date_create"] . "', " . $sfBlog["ad_id"] . ") and ");
-                    break;
-                case 1:
-                    $qSort = $qSort . "ads.date_create DESC, ads.ad_id DESC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.date_create, ads.ad_id)<('" . $sfBlog["date_create"] . "', " . $sfBlog["ad_id"] . ") and ");
-                    break;
-                case 2:
-                    $qSort = $qSort . "ads.date_create ASC, ads.ad_id ASC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.date_create, ads.ad_id)>('" . $sfBlog["date_create"] . "', " . $sfBlog["ad_id"] . ") and ");
-                    break;
-                case 3:
-                    $qSort = $qSort . "cities.name ASC, ads.ad_id ASC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (cities.name, ads.ad_id)>('" . $sfBlog["city"] . "', " . $sfBlog["ad_id"] . ") and ");
-                    break;
-                case 4:
-                    $qSort = $qSort . "cities.name desc, ads.ad_id desc, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (cities.name, ads.ad_id)<('" . $sfBlog["city"] . "', " . $sfBlog["ad_id"] . ") and ");
-                    break;
-                case 5:
-                    $qSort = $qSort . "models.name ASC, ads.ad_id ASC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (models.name, ads.ad_id)>('" . $sfBlog["model"] . "', " . $sfBlog["ad_id"] . ") and ");
-                    break;
-                case 6:
-                    $qSort = $qSort . "models.name desc, ads.ad_id desc, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (models.name, ads.ad_id)<('" . $sfBlog["model"] . "', " . $sfBlog["ad_id"] . ") and ");
-                    break;
-                case 7:
-                    $qSort = $qSort . "ads.price DESC, ads.ad_id DESC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.price, ads.ad_id)<('" . $sfBlog["price"] . "', " . $sfBlog["ad_id"] . ") and ");
-                    break;
-                case 8:
-                    $qSort = $qSort . "ads.price ASC, ads.ad_id ASC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.price, ads.ad_id)>('" . $sfBlog["price"] . "', " . $sfBlog["ad_id"] . ") and ");
-                    break;
-
-                case 9:
-                    $qSort = $qSort . "ads.mileage DESC, ads.ad_id DESC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.mileage, ads.ad_id)<('" . $sfBlog["mileage"] . "', " . $sfBlog["ad_id"] . ") and ");
-
-                case 10:
-                    $qSort = $qSort . "ads.mileage ASC, ads.ad_id ASC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (ads.mileage, ads.ad_id)>('" . $sfBlog["mileage"] . "', " . $sfBlog["ad_id"] . ") and ");
-
-                    break;
-
-            }
+            $qSort .= $sortID == 0 ? "ads.date_create DESC, " : "";
+            $qSort .= $sortID == 1 ? "ads.date_create DESC,  " : "";
+            $qSort .= $sortID == 2 ? "ads.date_create ASC,  " : "";
+            $qSort .= $sortID == 3 ? "cities.name ASC,  " : "";
+            $qSort .= $sortID == 4 ? "cities.name DESC,  " : "";
+            $qSort .= $sortID == 5 ? "models.name ASC,  " : "";
+            $qSort .= $sortID == 6 ? "models.name DESC,  " : "";
+            $qSort .= $sortID == 7 ? "ads.price DESC,  " : "";
+            $qSort .= $sortID == 8 ? "ads.price ASC,  " : "";
+            $qSort .= $sortID == 9 ? "ads.mileage DESC NULLS LAST, " : "";
+            $qSort .= $sortID == 10 ? "ads.mileage ASC,  " : "";
+            $qSort .= $sortID == 11 ? "ads.power DESC NULLS LAST, " : "";
+            $qSort .= $sortID == 12 ? "ads.power ASC,  " : "";
 
             // строим запрос выборки
-            $qWhere = $qWhere . (empty($p["ad_id"]) ? "" : " ad_id=" . $p["ad_id"] . " and ");
-
+            $qWhere = $qWhere . (empty($p["ad_id"]) ? "" : "ads.ad_id=" . $p["ad_id"] . " and ");
+            $qWhere = $qWhere . (empty($p["ads_id"]) ? "" : "ads.ad_id in (" . implode(', ', $p["ads_id"]) . ") and ");
             //для местоположения
             $qWhereLocat = "";
             $qWhereLocat .= empty($p["countries_id"]) ? "" : " countries.country_id in (" . implode(', ', $p["countries_id"]) . ") or ";
@@ -153,19 +111,19 @@ class Show
             $qWhere .= empty($stateID) ? "" : " ads.state_id in (" . implode(', ', $p["state_id"]) . ") and ";
             $qWhere .= empty($exchangeID) ? "" : " ads.exchange_id={$exchangeID} and ";
 
-            $qWhere = $qWhere . $qWherePag;
+            $qWhere = $qWhere;
             $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' or ');
             $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' and ');
             $qWhere = (empty($qWhere) ? "" : " where ") . $qWhere;
             $qSort = empty($qSort) ? "" : rtrim($qSort, ', ');
-            $qSort = (empty($qSort) ? "" : " ORDER BY ") . $qSort;
+            $qSort = (empty($qSort) ? "" : " ORDER BY ") . $qSort . ($page > 1 ? " OFFSET " . ($page * $limit - $limit) : "");
+
             // пишем в базу
             $db = $this->container['db'];
             $q =
-                " select ads.user_id as user_id, ads.ad_id as ad_id, ads.date_create, ads.description, " .
+                " select ads.user_id as user_id, ads.ad_id as ad_id, ads.date_create, ads.DESCription, " .
                 " ads.main_photo, ads.year as year, price::numeric(10,0) as price, " .
                 " mileage, power, volume, wheel_id, document_id, state_id, exchange_id, " .
-
                 " cities.city_id, cities.name as city, subjects.subject_id, subjects.name as subject, " .
                 " countries.country_id, countries.name as country, " .
                 " models.model_id, models.name as model, brands.brand_id, brands.name as brand, " .
@@ -184,10 +142,10 @@ class Show
                 " LEFT JOIN transmissions ON transmissions.transmission_id = ads.transmission_id " .
                 " LEFT JOIN bodies ON bodies.body_id = ads.body_id " .
                 " LEFT JOIN fuels ON fuels.fuel_id = ads.fuel_id " .
-                $qWhere . $qSort . " LIMIT 5";
+                $qWhere . $qSort . " LIMIT " . $limit;
             $ads = $db->query($q, \PDO::FETCH_ASSOC)->fetchAll();
             return ["status" => "ok",
-                "data" => ["ads" => $ads],
+                "data" => ["page" => $page, "ads" => $ads],
             ];
         } catch (RuntimeException | \Exception $e) {
 

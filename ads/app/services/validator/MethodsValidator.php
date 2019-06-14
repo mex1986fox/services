@@ -157,10 +157,17 @@ class MethodsValidator extends AbstractValidator
             $this->pushExc($name, "Не соответствует типу Uri");
         }
     }
-    public function toFloat($name, $value)
+    public function isFloat($name, $value)
     {
         if (!filter_var($value, FILTER_VALIDATE_FLOAT)) {
             $this->pushExc($name, " Не соответствует типу Float");
+        }
+
+    }
+    public function isInt($name, $value)
+    {
+        if (!filter_var($value, FILTER_VALIDATE_INT)) {
+            $this->pushExc($name, " Не соответствует типу Integer");
         }
 
     }

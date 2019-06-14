@@ -47,14 +47,14 @@ class StandardFiltering
             foreach ($p as $key => $value) {
                 if (is_array($value)) {
                     foreach ($value as $key2 => $value2) {
-                        $value[$key2] = $fChain->filter($value2);
+                        $p[$key][$key2] = $fChain->filter($value2);
                     }
                 } else {
                     $p[$key] = $fChain->filter($value);
                 }
 
             }
-
+            var_dump($p);
             // устанавливаем новые параметры в объект запроса
             // и обновляем его
             $request = $request->withQueryParams($p);
