@@ -42,14 +42,14 @@ class Show
                 "isInt" => [
                     ["ad_id", $p],
                     ["sort_id", $p], ["page", $p],
-                    ["countries_id", $p], ["subjects_id", $p], ["cities_id", $p],
-                    ["models_id", $p], ["brands_id", $p], ["types_id", $p],
                     ["drive_id", $p], ["transmission_id", $p], ["body_id", $p], ["mileage", $p], ["mileage2", $p],
                     ["fuel_id", $p], ["power", $p], ["power2", $p],
                     ["wheel_id", $p], ["document_id", $p], ["state_id", $p], ["exchange_id", $p],
                 ],
                 "isArray" => [
                     ["ads_id", $p],
+                    ["countries_id", $p], ["subjects_id", $p], ["cities_id", $p],
+                    ["models_id", $p], ["brands_id", $p], ["types_id", $p],
                 ],
                 "isFloat" => [
                     ["volume", $p], ["volume2", $p],

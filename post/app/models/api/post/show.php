@@ -18,111 +18,78 @@ class Show
             // передаем параметры в переменные
             $p = $this->request->getQueryParams();
             $exceptions = [];
-
-            $sortID = empty($p["sort_id"]) ? 0 : $p["sort_id"];
-            //для пагинации от какого id юзера шагать при выборке
-            $stepFrom = empty($p["step_from"]) ? "" : $p["step_from"];
-
-            $postID = empty($p["post_id"]) ? "" : $p["post_id"];
-            $title = empty($p["title"]) ? "" : $p["title"];
-            // $name = empty($p["name"]) ? "" : $p["name"];
-            // $surname = empty($p["surname"]) ? "" : $p["surname"];
-            $countriesID = empty($p["countries_id"]) ? "" : array_diff($p["countries_id"], array(''));
-            $subjectsID = empty($p["subjects_id"]) ? "" : array_diff($p["subjects_id"], array(''));
-            $citiesID = empty($p["cities_id"]) ? "" : array_diff($p["cities_id"], array(''));
-
-            $modelsID = empty($p["models_id"]) ? "" : array_diff($p["models_id"], array(''));
-            $brandsID = empty($p["brands_id"]) ? "" : array_diff($p["brands_id"], array(''));
-            $typesID = empty($p["types_id"]) ? "" : array_diff($p["types_id"], array(''));
-            // проверяем параметры
-            // if (empty($sortID)) {
-            //     $exceptions["sort_id"] = "Не указан.";
-            //     throw new \Exception("Ошибки в параметрах.");
-            // }
-            // if (!is_numeric($sortID)) {
-            //     $exceptions["sort_id"] = "Не соответствует типу integer.";
-            //     throw new \Exception("Ошибки в параметрах.");
-            // }
-            // if ($sortID < 1 || $sortID > 2) {
-            //     $exceptions["sort_id"] = "Не соответствует диапазону.";
-            //     throw new \Exception("Ошибки в параметрах.");
-            // }
-            //формируем условия сортировки
+            $limit = 5;
             $qSort = "";
             $qWhere = "";
-            $qWherePag = "";
-            if (!empty($stepFrom)) {
-                $db = $this->container['db'];
-                $q = "select post_id, date_create, cities.name as city, models.name as model from posts"
-                    . " LEFT JOIN cities ON cities.city_id = posts.city_id "
-                    . " LEFT JOIN models ON models.model_id = posts.model_id "
-                    . " where post_id=" . $stepFrom;
-                $sfBlog = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-                if (empty($sfBlog)) {
-                    $exceptions["step_from"] = "Не найден в системе.";
-                    throw new \Exception("Ошибки в параметрах.");
-                }
+            //для пагинации
+            $sortID = empty($p["sort_id"]) ? 0 : $p["sort_id"];
+            $page = empty($p["page"]) ? 1 : $p["page"];
+
+            // проверяем параметры
+            $valid = $this->container['validators'];
+            $vMethods = $valid->MethodsValidator;
+            // проверяем только заполненные параметры
+            if (!$vMethods->isValidFilled([
+                "emptyParamsFilled" => [
+                    ["post_id", $p], ["posts_id", $p],
+                    ["sort_id", $p], ["page", $p],
+                    ["countries_id", $p], ["subjects_id", $p], ["cities_id", $p],
+                    ["models_id", $p], ["brands_id", $p], ["types_id", $p],
+                    ["title", $p],
+                ],
+                "isInt" => [
+                    ["ad_id", $p],
+                    ["sort_id", $p], ["page", $p],
+                ],
+                "isArray" => [
+                    ["posts_id", $p],
+                    ["countries_id", $p], ["subjects_id", $p], ["cities_id", $p],
+                    ["models_id", $p], ["brands_id", $p], ["types_id", $p],
+                ],
+            ])) {
+                $exceptions = $vMethods->getExceptions();
+                throw new \Exception("Ошибки в параметрах.");
             }
 
-            switch ($sortID) {
-                case 0:
-                    $qSort = $qSort . "posts.date_create DESC, posts.post_id DESC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (posts.date_create, posts.post_id)<('" . $sfBlog["date_create"] . "', " . $sfBlog["post_id"] . ") and ");
-                    break;
-                case 1:
-                    $qSort = $qSort . "posts.date_create DESC, posts.post_id DESC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (posts.date_create, posts.post_id)<('" . $sfBlog["date_create"] . "', " . $sfBlog["post_id"] . ") and ");
-                    break;
-                case 2:
-                    $qSort = $qSort . "posts.date_create ASC, posts.post_id ASC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (posts.date_create, posts.post_id)>('" . $sfBlog["date_create"] . "', " . $sfBlog["post_id"] . ") and ");
-                    break;
-                case 3:
-                    $qSort = $qSort . "cities.name ASC, posts.post_id ASC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (cities.name, posts.post_id)>('" . $sfBlog["city"] . "', " . $sfBlog["post_id"] . ") and ");
-                    break;
-                case 4:
-                    $qSort = $qSort . "cities.name desc, posts.post_id desc, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (cities.name, posts.post_id)<('" . $sfBlog["city"] . "', " . $sfBlog["post_id"] . ") and ");
-                    break;
-                case 5:
-                    $qSort = $qSort . "models.name ASC, posts.post_id ASC, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (models.name, posts.post_id)>('" . $sfBlog["model"] . "', " . $sfBlog["post_id"] . ") and ");
-                    break;
-                case 6:
-                    $qSort = $qSort . "models.name desc, posts.post_id desc, ";
-                    $qWherePag = $qWherePag . (empty($sfBlog) ? "" : " (models.name, posts.post_id)<('" . $sfBlog["model"] . "', " . $sfBlog["post_id"] . ") and ");
-                    break;
-            }
+            //формируем условия сортировки
+            $qSort .= $sortID == 0 ? "posts.date_create DESC,  " : "";
+            $qSort .= $sortID == 1 ? "posts.date_create DESC,  " : "";
+            $qSort .= $sortID == 2 ? "posts.date_create ASC,  " : "";
+            $qSort .= $sortID == 3 ? "cities.name ASC,  " : "";
+            $qSort .= $sortID == 4 ? "cities.name desc,  " : "";
+            $qSort .= $sortID == 5 ? "models.name ASC,  " : "";
+            $qSort .= $sortID == 6 ? "models.name desc,  " : "";
 
             // строим запрос выборки
-            $qWhere = $qWhere . (empty($postID) ? "" : " post_id=" . $postID . " and ");
-
-            $qWhere = $qWhere . (empty($title) ? "" : " posts.title ILIKE '%" . $title . "%' and ");
+            $qWhere = $qWhere . (empty($p["post_id"]) ? "" : " post_id=" . $p["post_id"] . " and ");
+            $qWhere = $qWhere . (empty($p["posts_id"]) ? "" : "ads.ad_id in (" . implode(', ', $p["posts_id"]) . ") and ");
 
             //для местоположения
-            if (!empty($citiesID) || !empty($subjectsID) || !empty($countriesID)) {
-                $qWhere = $qWhere . " (";
-            } //  для страны
-            $qWhere = $qWhere . (empty($countriesID) ? "" : " countries.country_id in (" . implode(', ', $countriesID) . ") or ");
-            //  для региона
-            $qWhere = $qWhere . (empty($subjectsID) ? "" : " subjects.subject_id in (" . implode(', ', $subjectsID) . ") or ");
-            //  для города
-            $qWhere = $qWhere . (empty($citiesID) ? "" : " cities.city_id in (" . implode(', ', $citiesID) . ") or ");
-            $qWhere = $qWhere . (empty($modelsID) ? "" : " models.model_id in (" . implode(', ', $modelsID) . ") or ");
-            $qWhere = $qWhere . (empty($brandsID) ? "" : " brands.brand_id in (" . implode(', ', $brandsID) . ") or ");
-            $qWhere = $qWhere . (empty($typesID) ? "" : " types.type_id in (" . implode(', ', $typesID) . ") or ");
-            if (!empty($citiesID) || !empty($subjectsID) || !empty($countriesID)) {
-                $qWhere = rtrim($qWhere, ' or ') . ") and ";
+            $qWhereLocat = "";
+            $qWhereLocat .= empty($p["countries_id"]) ? "" : " countries.country_id in (" . implode(', ', $p["countries_id"]) . ") or ";
+            $qWhereLocat .= empty($p["subjects_id"]) ? "" : " subjects.subject_id in (" . implode(', ', $p["subjects_id"]) . ") or ";
+            $qWhereLocat .= empty($p["cities_id"]) ? "" : " cities.city_id in (" . implode(', ', $p["cities_id"]) . ") or ";
+            if (!empty($qWhereLocat)) {
+                $qWhere .= " (" . rtrim($qWhereLocat, ' or ') . ") and ";
+            }
+            //для транспорта
+            $qWhereTrans = "";
+            $qWhereTrans .= empty($p["models_id"]) ? "" : " models.model_id in (" . implode(', ', $p["models_id"]) . ") or ";
+            $qWhereTrans .= empty($p["brands_id"]) ? "" : " brands.brand_id in (" . implode(', ', $p["brands_id"]) . ") or ";
+            $qWhereTrans .= empty($p["types_id"]) ? "" : " types.type_id in (" . implode(', ', $p["types_id"]) . ") or ";
+            if (!empty($qWhereTrans)) {
+                $qWhere .= " (" . rtrim($qWhereTrans, ' or ') . ") and ";
             }
 
-            $qWhere = $qWhere . $qWherePag;
+            $qWhere = $qWhere . (empty($p["title"]) ? "" : " posts.title ILIKE '%" . $p["title"] . "%' and ");
+
+            $qWhere = $qWhere;
             $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' or ');
             $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' and ');
             $qWhere = (empty($qWhere) ? "" : " where ") . $qWhere;
-
             $qSort = empty($qSort) ? "" : rtrim($qSort, ', ');
-            $qSort = (empty($qSort) ? "" : " ORDER BY ") . $qSort;
+            $qSort = (empty($qSort) ? "" : " ORDER BY ") . $qSort . ($page > 1 ? " OFFSET " . ($page * $limit - $limit) : "");
+
             // пишем в базу
             $db = $this->container['db'];
             $q =
@@ -140,10 +107,10 @@ class Show
                 " LEFT JOIN brands ON brands.brand_id = models.brand_id " .
                 " LEFT JOIN types ON types.type_id = models.type_id " .
                 " LEFT JOIN votes ON votes.user_id = posts.user_id  and votes.post_id = posts.post_id" .
-                $qWhere . $qSort . " LIMIT 5";
+                $qWhere . $qSort . " LIMIT " . $limit;
             $posts = $db->query($q, \PDO::FETCH_ASSOC)->fetchAll();
             return ["status" => "ok",
-                "data" => ["posts" => $posts],
+                "data" => ["page" => $page, "posts" => $posts],
             ];
         } catch (RuntimeException | \Exception $e) {
 

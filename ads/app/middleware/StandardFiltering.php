@@ -54,7 +54,6 @@ class StandardFiltering
                 }
 
             }
-            var_dump($p);
             // устанавливаем новые параметры в объект запроса
             // и обновляем его
             $request = $request->withQueryParams($p);
