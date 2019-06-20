@@ -35,8 +35,14 @@ class Update
 
             // проверяем только заполненные параметры
             if (!$vMethods->isValidFilled([
+                // "emptyParamsFilled" => [
+                //     ["city_id", $p],
+                //     ["model_id", $p],
+                // ],
                 "isAccessToken" => [["access_token", $p]],
                 "isNumeric" => [
+                    ["city_id", $p],
+                    ["model_id", $p],
                     ["drive_id", $p],
                     ["transmission_id", $p],
                     ["body_id", $p],
@@ -53,7 +59,7 @@ class Update
                     ["mileage", $p, ["min" => 0, "max" => 99999999]],
                     ["power", $p, ["min" => 1, "max" => 9999]],
                 ],
-                "toFloat" => [
+                "isFloat" => [
                     ["volume", $p],
                 ],
                 "uri" => [
@@ -70,22 +76,33 @@ class Update
             $tokenStructur->setToken($p["access_token"]);
             $profileID = $tokenStructur->getUserID();
 
+            // переводим в null
+            $nullPars = ["drive_id", "transmission_id", "body_id", "mileage", "fuel_id", "power", "volume",
+                "wheel_id", "document_id", "state_id", "exchange_id", "description"];
+            foreach ($nullPars as $key => $value) {
+                if ($p[$value] == 0 && $p[$value] == '0') {
+                    $p[$value] = 'null';
+                }
+                if ($p[$value] === "") {
+                    $p[$value] = ' ';
+                }
+            }
             // формируем запрос
             $qSet = "";
-            $qSet = $qSet . (empty($p["drive_id"]) ? "" : " drive_id={$p["drive_id"]},");
-            $qSet = $qSet . (empty($p["transmission_id"]) ? "" : " transmission_id={$p["transmission_id"]},");
-            $qSet = $qSet . (empty($p["body_id"]) ? "" : " body_id={$p["body_id"]},");
-            $qSet = $qSet . (empty($p["mileage"]) ? "" : " mileage={$p["mileage"]},");
-
-            $qSet = $qSet . (empty($p["fuel_id"]) ? "" : " fuel_id={$p["fuel_id"]},");
-            $qSet = $qSet . (empty($p["power"]) ? "" : " power={$p["power"]},");
-            $qSet = $qSet . (empty($p["volume"]) ? "" : " volume={$p["volume"]},");
-
-            $qSet = $qSet . (empty($p["wheel_id"]) ? "" : " wheel_id={$p["wheel_id"]},");
-            $qSet = $qSet . (empty($p["document_id"]) ? "" : " document_id={$p["document_id"]},");
-            $qSet = $qSet . (empty($p["state_id"]) ? "" : " state_id={$p["state_id"]},");
-            $qSet = $qSet . (empty($p["exchange_id"]) ? "" : " exchange_id={$p["exchange_id"]},");
-            $qSet = $qSet . (empty($p["description"]) ? "" : " description='{$p["description"]}',");
+            // $qSet .= (empty($p["city_id"]) ? "" : " city_id={$p["city_id"]},");
+            // $qSet .= (empty($p["model_id"]) ? "" : " model_id={$p["model_id"]},");
+            $qSet .= (empty($p["drive_id"]) ? "" : " drive_id={$p["drive_id"]},");
+            $qSet .= (empty($p["transmission_id"]) ? "" : " transmission_id={$p["transmission_id"]},");
+            $qSet .= (empty($p["body_id"]) ? "" : " body_id={$p["body_id"]},");
+            $qSet .= (empty($p["mileage"]) ? "" : " mileage={$p["mileage"]},");
+            $qSet .= (empty($p["fuel_id"]) ? "" : " fuel_id={$p["fuel_id"]},");
+            $qSet .= (empty($p["power"]) ? "" : " power={$p["power"]},");
+            $qSet .= (empty($p["volume"]) ? "" : " volume={$p["volume"]},");
+            $qSet .= (empty($p["wheel_id"]) ? "" : " wheel_id={$p["wheel_id"]},");
+            $qSet .= (empty($p["document_id"]) ? "" : " document_id={$p["document_id"]},");
+            $qSet .= (empty($p["state_id"]) ? "" : " state_id={$p["state_id"]},");
+            $qSet .= (empty($p["exchange_id"]) ? "" : " exchange_id={$p["exchange_id"]},");
+            $qSet .= (empty($p["description"]) ? "" : " description='{$p["description"]}',");
 
             if (!empty($p["main_photo"])) {
                 $qSet = $qSet . ($p["main_photo"] == "null" ? " main_photo=null," : " main_photo='{$p["main_photo"]}',");
@@ -111,7 +128,8 @@ class Update
                 " models.model_id, models.name as model, brands.brand_id, brands.name as brand, " .
                 " types.type_id, types.name as type,  " .
                 " votes.likes as likes, votes.dislikes as dislikes, " .
-                " drives.name as drive, transmissions.name as transmission, bodies.name as body, fuels.name as fuel " .
+                " drives.name as drive, transmissions.name as transmission, bodies.name as body, fuels.name as fuel, " .
+                " drives.drive_id as drive_id, transmissions.transmission_id as transmission_id, bodies.body_id as body_id, fuels.fuel_id as fuel_id " .
                 " from ads " .
                 " LEFT JOIN cities ON cities.city_id = ads.city_id " .
                 " LEFT JOIN subjects ON subjects.subject_id = cities.subject_id " .

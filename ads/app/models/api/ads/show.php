@@ -129,7 +129,8 @@ class Show
                 " models.model_id, models.name as model, brands.brand_id, brands.name as brand, " .
                 " types.type_id, types.name as type,  " .
                 " votes.likes as likes, votes.dislikes as dislikes, " .
-                " drives.name as drive, transmissions.name as transmission, bodies.name as body, fuels.name as fuel " .
+                " drives.name as drive, transmissions.name as transmission, bodies.name as body, fuels.name as fuel, " .
+                " drives.drive_id as drive_id, transmissions.transmission_id as transmission_id, bodies.body_id as body_id, fuels.fuel_id as fuel_id " .
                 " from ads " .
                 " LEFT JOIN cities ON cities.city_id = ads.city_id " .
                 " LEFT JOIN subjects ON subjects.subject_id = cities.subject_id " .

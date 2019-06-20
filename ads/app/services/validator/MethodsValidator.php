@@ -159,7 +159,7 @@ class MethodsValidator extends AbstractValidator
     }
     public function isFloat($name, $value)
     {
-        if (!filter_var($value, FILTER_VALIDATE_FLOAT)) {
+        if (filter_var($value, FILTER_VALIDATE_FLOAT) === false) {
             $this->pushExc($name, " Не соответствует типу Float");
         }
 
