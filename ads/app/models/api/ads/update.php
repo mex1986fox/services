@@ -35,12 +35,14 @@ class Update
 
             // проверяем только заполненные параметры
             if (!$vMethods->isValidFilled([
-                // "emptyParamsFilled" => [
-                //     ["city_id", $p],
-                //     ["model_id", $p],
-                // ],
+                "emptyParamsFilled" => [
+                    ["year", $p],
+                    ["price", $p],
+                ],
                 "isAccessToken" => [["access_token", $p]],
                 "isNumeric" => [
+                    ["year", $p],
+                    ["price", $p],
                     ["city_id", $p],
                     ["model_id", $p],
                     ["drive_id", $p],
@@ -56,8 +58,10 @@ class Update
                     ["ad_id", $p],
                 ],
                 "between" => [
+                    ["price", $p, ["min" => 500, "max" => 999999999]],
+                    ["year", $p, ["min" => 1936, "max" => date("Y")]],
                     ["mileage", $p, ["min" => 0, "max" => 99999999]],
-                    ["power", $p, ["min" => 1, "max" => 9999]],
+                    ["power", $p, ["min" => 0, "max" => 9999]],
                 ],
                 "isFloat" => [
                     ["volume", $p],
@@ -80,10 +84,10 @@ class Update
             $nullPars = ["drive_id", "transmission_id", "body_id", "mileage", "fuel_id", "power", "volume",
                 "wheel_id", "document_id", "state_id", "exchange_id", "description"];
             foreach ($nullPars as $key => $value) {
-                if ($p[$value] == 0 && $p[$value] == '0') {
+                if (isset($p[$value]) && $p[$value] == 0 && $p[$value] == '0') {
                     $p[$value] = 'null';
                 }
-                if ($p[$value] === "") {
+                if (isset($p[$value]) && $p[$value] === "") {
                     $p[$value] = ' ';
                 }
             }
@@ -91,6 +95,8 @@ class Update
             $qSet = "";
             // $qSet .= (empty($p["city_id"]) ? "" : " city_id={$p["city_id"]},");
             // $qSet .= (empty($p["model_id"]) ? "" : " model_id={$p["model_id"]},");
+            $qSet .= (empty($p["year"]) ? "" : " year={$p["year"]},");
+            $qSet .= (empty($p["price"]) ? "" : " price={$p["price"]},");
             $qSet .= (empty($p["drive_id"]) ? "" : " drive_id={$p["drive_id"]},");
             $qSet .= (empty($p["transmission_id"]) ? "" : " transmission_id={$p["transmission_id"]},");
             $qSet .= (empty($p["body_id"]) ? "" : " body_id={$p["body_id"]},");
