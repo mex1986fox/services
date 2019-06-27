@@ -39,6 +39,7 @@ class Update
             $accessToken = $p["access_token"];
             $tokenStructur = new TokenStructur($this->container);
             $tokenStructur->setToken($accessToken);
+            $profileID = $tokenStructur->getUserID();
 
             // проверяем параметры
             $valid = $this->container['validators'];
@@ -120,8 +121,25 @@ class Update
             if (empty($post["user_id"])) {
                 throw new \Exception("Такой пост не существует.");
             }
+            $q =
+                " select posts.user_id as user_id, posts.post_id as post_id, posts.date_create, posts.title, posts.description, posts.main_photo," .
+                " cities.city_id, cities.name as city, subjects.subject_id, subjects.name as subject, " .
+                " countries.country_id, countries.name as country, " .
+                " models.model_id, models.name as model, brands.brand_id, brands.name as brand, " .
+                " types.type_id, types.name as type,  " .
+                " votes.likes as likes, votes.dislikes as dislikes " .
+                " from posts " .
+                " LEFT JOIN cities ON cities.city_id = posts.city_id " .
+                " LEFT JOIN subjects ON subjects.subject_id = cities.subject_id " .
+                " LEFT JOIN countries ON countries.country_id = cities.country_id " .
+                " LEFT JOIN models ON models.model_id = posts.model_id " .
+                " LEFT JOIN brands ON brands.brand_id = models.brand_id " .
+                " LEFT JOIN types ON types.type_id = models.type_id " .
+                " LEFT JOIN votes ON votes.user_id = posts.user_id  and votes.post_id = posts.post_id " .
+                " WHERE posts.user_id={$profileID} and posts.post_id={$postID}";
+            $postSelect = $db->query($q, \PDO::FETCH_ASSOC)->fetchAll();
             return ["status" => "ok",
-                "data" => ["post" => $post],
+                "data" => ["post" => $postSelect],
             ];
 
         } catch (RuntimeException | \Exception $e) {
