@@ -31,6 +31,7 @@ class Show
             // проверяем только заполненные параметры
             if (!$vMethods->isValidFilled([
                 "emptyParamsFilled" => [
+                    ["user_id", $p], ["users_id", $p],
                     ["post_id", $p], ["posts_id", $p],
                     ["sort_id", $p], ["page", $p],
                     ["countries_id", $p], ["subjects_id", $p], ["cities_id", $p],
@@ -38,10 +39,13 @@ class Show
                     ["title", $p],
                 ],
                 "isInt" => [
+                    ["user_id", $p],
+                    ["post_id", $p],
                     ["ad_id", $p],
                     ["sort_id", $p], ["page", $p],
                 ],
                 "isArray" => [
+                    ["users_id", $p],
                     ["posts_id", $p],
                     ["countries_id", $p], ["subjects_id", $p], ["cities_id", $p],
                     ["models_id", $p], ["brands_id", $p], ["types_id", $p],
@@ -61,8 +65,10 @@ class Show
             $qSort .= $sortID == 6 ? "models.name desc,  " : "";
 
             // строим запрос выборки
-            $qWhere = $qWhere . (empty($p["post_id"]) ? "" : " post_id=" . $p["post_id"] . " and ");
-            $qWhere = $qWhere . (empty($p["posts_id"]) ? "" : "ads.ad_id in (" . implode(', ', $p["posts_id"]) . ") and ");
+            $qWhere = $qWhere . (empty($p["user_id"]) ? "" : " posts.user_id=" . $p["user_id"] . " and ");
+            $qWhere = $qWhere . (empty($p["users_id"]) ? "" : "posts.user_id in (" . implode(', ', $p["users_id"]) . ") and ");
+            $qWhere = $qWhere . (empty($p["post_id"]) ? "" : " posts.post_id=" . $p["post_id"] . " and ");
+            $qWhere = $qWhere . (empty($p["posts_id"]) ? "" : "posts.post_id in (" . implode(', ', $p["posts_id"]) . ") and ");
 
             //для местоположения
             $qWhereLocat = "";
