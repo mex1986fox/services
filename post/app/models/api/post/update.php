@@ -137,7 +137,7 @@ class Update
                 " LEFT JOIN types ON types.type_id = models.type_id " .
                 " LEFT JOIN votes ON votes.user_id = posts.user_id  and votes.post_id = posts.post_id " .
                 " WHERE posts.user_id={$profileID} and posts.post_id={$postID}";
-            $postSelect = $db->query($q, \PDO::FETCH_ASSOC)->fetchAll();
+            $postSelect = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
             return ["status" => "ok",
                 "data" => ["post" => $postSelect],
             ];
