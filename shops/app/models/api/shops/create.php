@@ -71,7 +71,7 @@ class Create
             }
 
             $q =
-                " select shops.user_id as user_id, shops.date_create, shops.description, " .
+                " select shops.shop_id as shop_id, shops.user_id as user_id, shops.date_create, shops.description, " .
                 " shops.main_photo, shops.title as title, " .
                 " cities.city_id, cities.name as city, subjects.subject_id, subjects.name as subject, " .
                 " countries.country_id, countries.name as country " .
