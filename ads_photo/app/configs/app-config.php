@@ -11,6 +11,7 @@ return [
             'pass' => "suser",
             'dbname' => "adsphotos",
         ],
+        'name_servers' => "adsphoto",
     ],
     "closed_records" => [
         "paths" => [

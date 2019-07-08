@@ -8,17 +8,17 @@ class RequestDeleteAlbum
     {
         $this->container = $container;
     }
-    public function go(int $userID, int $adID)
+    public function go(int $userID, int $entityID)
     {
         try {
             // удалить папку с содержимым
 
-            $dir = MP_PRODIR . "/public/photos/$userID/$adID";
+            $dir = MP_PRODIR . "/public/photos/$userID/$entityID";
             $this->unlinkRecursive($dir, true);
 
             // удалить запись в базе
             $db = $this->container['db'];
-            $q = "delete from photos where user_id={$userID} and ad_id={$adID}";
+            $q = "delete from photos where user_id={$userID} and entity_id={$entityID}";
             $db->query($q, \PDO::FETCH_ASSOC)->fetch();
 
             return true;

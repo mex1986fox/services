@@ -8,47 +8,30 @@ class RequestUpdateFiles
     {
         $this->container = $container;
     }
-    public function go(int $userID, int $adID)
+    public function go(int $userID, int $entityID)
     {
         try {
             // читаем имена файлов в папке
-            $files = scandir(MP_PRODIR . "/public/photos/$userID/$adID/origin");
+            $files = scandir(MP_PRODIR . "/public/photos/$userID/$entityID/origin");
             $origin = array();
-            foreach ($files as $key => $file) {
-                $key=str_replace(".jpg", "", $file);
-                if ($file != "." && $file != "..") {
-                    $origin[$key] = "/public/photos/$userID/$adID/origin/" . $file;
-                }
-            }
-            $files = scandir(MP_PRODIR . "/public/photos/$userID/$adID/mini");
             $mini = array();
+            $mainPhoto = "";
             foreach ($files as $key => $file) {
-                $key=str_replace(".jpg", "", $file);
+                $key = str_replace(".jpg", "", $file);
                 if ($file != "." && $file != "..") {
-                    $mini[$key] = "/public/photos/$userID/$adID/mini/" . $file;
+                    if ($mainPhoto == "") {$mainPhoto = $key;}
+                    $origin[$key] = "/public/photos/{$userID}/{$entityID}/origin/{$key}.jpg";
+                    $mini[$key] = "/public/photos/{$userID}/{$entityID}/mini/{$key}.jpg";
                 }
             }
-
-            // определить есть ли запись в базе
+            $jeOrigin = json_encode($origin);
+            $jeMini = json_encode($mini);
             $db = $this->container['db'];
-            $q = "select * from photos where user_id={$userID} and ad_id={$adID}";
-            $user = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-            // если нет добавить ее
-            if (empty($user["user_id"])) {
-                $q = "insert into photos (user_id, ad_id) values ({$userID}, {$adID})";
-                $user = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-                $album = ["main" => null, "files" => ["origin" => [], "mini" => []]];
-            } else {
-                // вытянуть из базы объект файлов
-                $album = json_decode($user["albums"], 1);
-            }
-            // заполнить объект альбома
-            $album["files"]["origin"] = $origin;
-            $album["files"]["mini"] = $mini;
-            $albumString = json_encode($album);
-            // записать в базу
-            $q = "update photos set albums='{$albumString}' where user_id={$userID} and ad_id={$adID}";
-            $user = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            $q =
+                " insert into photos (user_id, entity_id, main, origin, mini) values ({$userID}, {$entityID}, '{$mainPhoto}', '{$jeOrigin}', '{$jeMini}')" .
+                " on conflict (user_id, entity_id) do " .
+                " update set origin='{$jeOrigin}', mini='{$jeMini}'; ";
+            $db->query($q, \PDO::FETCH_ASSOC)->fetch();
 
             return true;
         } catch (RuntimeException | \Exception $e) {

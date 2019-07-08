@@ -10,7 +10,7 @@ create table "photos"(
     user_id bigint,
     post_id bigint,
     albums jsonb default '{"main":null,"files":{"origin":[],"mini":[]}}',
-     UNIQUE  (user_id, post_id),
+    UNIQUE  (user_id, post_id),
     PRIMARY KEY (user_id, post_id)
 );
 -- albums

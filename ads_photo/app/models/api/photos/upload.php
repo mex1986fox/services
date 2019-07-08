@@ -28,7 +28,7 @@ class Upload
             if (!$vMethods->isValid([
                 "emptyParams" => [
                     ["access_token", $p],
-                    ["ad_id", $p],
+                    ["entity_id", $p],
                     ["files", $_FILES],
                 ]])) {
                 $exceptions = $vMethods->getExceptions();
@@ -36,12 +36,12 @@ class Upload
             };
 
             //передаем в переменные
-            $adID = $p["ad_id"];
+            $entityID = $p["entity_id"];
             $files = $_FILES["files"]["name"];
             $accessToken = $p["access_token"];
             // проверяем параметры
             if (!$vMethods->isValid([
-                "isNumeric" => [["ad_id", $adID]],
+                "isNumeric" => [["entity_id", $entityID]],
                 "isAccessToken" => [["access_token", $accessToken]],
                 "isArray" => [["files", $files]],
             ])) {
@@ -55,7 +55,6 @@ class Upload
             $vLoadImg = $valid->ImgValidator;
             //вынимаем из токена id юзера
             $userID = $tokenStructur->getUserID();
-            $adID = $p["ad_id"];
             // добавляем конвертер
             $converters = $this->container['converters'];
             $cImg = $converters->ImgConverter;
@@ -77,14 +76,14 @@ class Upload
                     $file = $cImg->isTransform($file['tmp_name'], 1024);
                     // сохранить файл на сервер
                     $name = uniqid() . ".jpg";
-                    $path = MP_PRODIR . "/public/photos/$userID/$adID/origin";
+                    $path = MP_PRODIR . "/public/photos/$userID/$entityID/origin";
                     if (!file_exists($path)) {
                         mkdir($path, 0777, true);
                     }
                     imagejpeg($file, $path . "/" . $name);
                     // сохранить миниатюру файл на сервер
                     $filemini = $cImg->isTransform($path . "/" . $name, 320);
-                    $pathmini = MP_PRODIR . "/public/photos/$userID/$adID/mini";
+                    $pathmini = MP_PRODIR . "/public/photos/$userID/$entityID/mini";
                     if (!file_exists($pathmini)) {
                         mkdir($pathmini, 0777, true);
                     }
@@ -100,8 +99,8 @@ class Upload
             // обновим список файлов в базе
             $dbreqwests = $this->container['db-requests'];
             $dbrUF = $dbreqwests->RequestUpdateFiles;
-            $dbrUFStatus = $dbrUF->go($userID, $adID);
-            if ($dbrUFStatus != true) {
+            $dbrUFStatus = $dbrUF->go($userID, $entityID);
+            if ($dbrUFStatus !== true) {
                 throw new \Exception($dbrUFStatus);
             }
             return ["status" => "ok",
@@ -122,16 +121,16 @@ class Upload
             ];
         }
     }
-    public function reArrayFiles(&$file_ad)
+    public function reArrayFiles(&$file_post)
     {
 
         $file_ary = array();
-        $file_count = count($file_ad['name']);
-        $file_keys = array_keys($file_ad);
+        $file_count = count($file_post['name']);
+        $file_keys = array_keys($file_post);
 
         for ($i = 0; $i < $file_count; $i++) {
             foreach ($file_keys as $key) {
-                $file_ary[$i][$key] = $file_ad[$key][$i];
+                $file_ary[$i][$key] = $file_post[$key][$i];
             }
         }
 

@@ -25,15 +25,15 @@ class Delete
             if (empty($p["access_token"])) {
                 $exceptions["access_token"] = "Не указан.";
             }
-            if (empty($p["ad_id"])) {
-                $exceptions["ad_id"] = "Не указан.";
+            if (empty($p["entity_id"])) {
+                $exceptions["entity_id"] = "Не указан.";
             }
             if (!empty($exceptions)) {
                 throw new \Exception("Ошибки в параметрах.");
             }
 
             // передаем параметры в переменные
-            $postID = $p["ad_id"];
+            $entityID = $p["entity_id"];
             $accessToken = $p["access_token"];
 
             // проверяем параметры
@@ -46,8 +46,8 @@ class Delete
             if (!$vToken->isValid($tokenStructur)) {
                 $exceptions["access_token"] = "Не действителен.";
             }
-            if (!is_numeric($p["ad_id"])) {
-                $exceptions["ad_id"] = "Не соответствует типу integer.";
+            if (!is_numeric($p["entity_id"])) {
+                $exceptions["entity_id"] = "Не соответствует типу integer.";
             }
             if (!empty($exceptions)) {
                 throw new \Exception("Ошибки в параметрах.");
@@ -59,7 +59,7 @@ class Delete
             // удалим альбом в базе и дерриктории
             $dbreq = $this->container['db-requests'];
             $dbrDA = $dbreq->RequestDeleteAlbum;
-            $dbrDAStatus = $dbrDA->go($userID, $postID);
+            $dbrDAStatus = $dbrDA->go($userID, $entityID);
             if ($dbrDAStatus != true) {
                 throw new \Exception($dbrDAStatus);
             }

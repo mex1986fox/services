@@ -4,7 +4,7 @@ namespace App\Controllers\Api;
 use \App\Controllers\MainController;
 use \App\Models\Api\Photos\Delete as Delete;
 use \App\Models\Api\Photos\Show as Show;
-use \App\Models\Api\Photos\Update as Update;
+use \App\Models\Api\Photos\CheckMain as CheckMain;
 use \App\Models\Api\Photos\Upload as Upload;
 
 class PhotoController extends MainController
@@ -43,10 +43,10 @@ class PhotoController extends MainController
         return $response;
 
     }
-    public function update($request, $response, $args)
+    public function delete($request, $response, $args)
     {
         $cont = $this->container;
-        $reg = new Update($cont, $request, $response);
+        $reg = new Delete($cont, $request, $response);
         $answer = $reg->run();
         if ($answer['status'] == "ok") {
             $response = $response->withJson($answer, 200);
@@ -59,10 +59,10 @@ class PhotoController extends MainController
         }
         return $response;
     }
-    public function delete($request, $response, $args)
+    public function checkMain($request, $response, $args)
     {
         $cont = $this->container;
-        $reg = new Delete($cont, $request, $response);
+        $reg = new CheckMain($cont, $request, $response);
         $answer = $reg->run();
         if ($answer['status'] == "ok") {
             $response = $response->withJson($answer, 200);

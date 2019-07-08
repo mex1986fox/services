@@ -15,5 +15,5 @@ create table "photos"(
     UNIQUE  (user_id, entity_id),
     PRIMARY KEY (user_id, entity_id)
 );
--- главное фото всегда первое
+
 

@@ -93,7 +93,7 @@ class Delete
                 }
             }
             if ($flagDrop === true) {
-                //даходим главное фото в базе
+                //удаляем запись
                 $q = "delete from photos where user_id={$userID} and entity_id={$entityID};";
                 $db->query($q, \PDO::FETCH_ASSOC)->fetch();
 
