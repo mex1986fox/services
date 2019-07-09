@@ -5,7 +5,6 @@ CREATE USER suser WITH password 'suser';
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO "suser";
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO "suser";
 
--- таблица пользователей
 create table "photos"(
     user_id bigint,
     entity_id bigint,

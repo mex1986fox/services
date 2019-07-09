@@ -9,8 +9,9 @@ return [
             'port' => '5432',
             'user' => "suser",
             'pass' => "suser",
-            'dbname' => "postphotos",
+            'dbname' => "adsphotos",
         ],
+        'name_servers' => "postphotos",
     ],
     "closed_records" => [
         "paths" => [

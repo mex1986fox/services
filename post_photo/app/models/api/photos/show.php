@@ -16,6 +16,7 @@ class Show
         // показывает юзеров в системе
         try {
             // передаем параметры в переменные
+            $limit = 200;
             $p = $this->request->getQueryParams();
             $exceptions = [];
             if (!empty($p["users_id"])) {
@@ -24,18 +25,18 @@ class Show
                     throw new \Exception("Ошибки в параметрах.");
                 }
             }
-            if (!empty($p["posts_id"])) {
-                if (!is_array($p["posts_id"])) {
-                    $exceptions["posts_id"] = "Должен быть массивом.";
+            if (!empty($p["entities_id"])) {
+                if (!is_array($p["entities_id"])) {
+                    $exceptions["entities_id"] = "Должен быть массивом.";
                     throw new \Exception("Ошибки в параметрах.");
                 }
             }
             $usersID = empty($p["users_id"]) ? "" : implode(",", $p["users_id"]);
-            $postsID = empty($p["posts_id"]) ? "" : implode(",", $p["posts_id"]);
+            $entitiesID = empty($p["entities_id"]) ? "" : implode(",", $p["entities_id"]);
             // строим запрос
             $qWhere = "";
             $qWhere = $qWhere . (empty($usersID) ? "" : " user_id in ({$usersID}) and ");
-            $qWhere = $qWhere . (empty($postsID) ? "" : " post_id in ({$postsID}) and ");
+            $qWhere = $qWhere . (empty($entitiesID) ? "" : " entity_id in ({$entitiesID}) and ");
 
             $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' or ');
             $qWhere = empty($qWhere) ? "" : rtrim($qWhere, ' and ');
@@ -43,16 +44,14 @@ class Show
 
             // пишем в базу
             $db = $this->container['db'];
-           $q = "select albums, user_id from photos " . $qWhere;
+            $q = "select * from photos " . $qWhere . " LIMIT " . $limit;
             $albums = $db->query($q, \PDO::FETCH_ASSOC)->fetchAll();
-            $files = array();
             foreach ($albums as $key => $album) {
-                $alb = json_decode($album["albums"], 1);
-                $alb["user_id"] = $album["user_id"];
-                $files[] = $alb;
+                $albums[$key]["mini"] = json_decode($album["mini"], true);
+                $albums[$key]["origin"] = json_decode($album["origin"], true);
             }
             return ["status" => "ok",
-                "data" => $files,
+                "data" => ["albums" => $albums],
             ];
         } catch (RuntimeException | \Exception $e) {
 
