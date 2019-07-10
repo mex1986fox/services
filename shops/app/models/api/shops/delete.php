@@ -26,8 +26,8 @@ class Delete
             if (empty($p["access_token"])) {
                 $exceptions["access_token"] = "Не указан.";
             }
-            if (empty($p["ad_id"])) {
-                $exceptions["ad_id"] = "Не указан.";
+            if (empty($p["shop_id"])) {
+                $exceptions["shop_id"] = "Не указан.";
             }
             if (!empty($exceptions)) {
                 throw new \Exception("Ошибки в параметрах.");
@@ -35,9 +35,9 @@ class Delete
 
             // проверяем параметры
             $accessToken = $p["access_token"];
-            $adID = $p["ad_id"];
-            if (!is_numeric($adID)) {
-                $exceptions["ad_id"] = "Не соответствует типу integer.";
+            $shopID = $p["shop_id"];
+            if (!is_numeric($shopID)) {
+                $exceptions["shop_id"] = "Не соответствует типу integer.";
                 throw new \Exception("Ошибки в параметрах.");
             }
 
@@ -56,11 +56,11 @@ class Delete
 
             // пишем в базу
             // удаляем лайки
-            $q = "delete from votes where user_id={$profileID} and ad_id={$adID}";
-            $db = $this->container['db'];
-            $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            // $q = "delete from votes where user_id={$profileID} and shop_id={$shopID}";
+            // $db = $this->container['db'];
+            // $db->query($q, \PDO::FETCH_ASSOC)->fetch();
             // удаляем посты
-            $q = "delete from ads where user_id={$profileID} and ad_id={$adID}";
+            $q = "delete from shops where user_id={$profileID} and shop_id={$shopID}";
             $db = $this->container['db'];
             $db->query($q, \PDO::FETCH_ASSOC)->fetch();
 

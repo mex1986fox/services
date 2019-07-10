@@ -39,11 +39,11 @@ class Update
                     ["shop_id", $p],
                     ["main_photo", $p],
                     ["title", $p],
-                ],
+                      ],
                 "isAccessToken" => [["access_token", $p]],
                 "isNumeric" => [
                     ["shop_id", $p],
-                ],
+                      ],
                 "uri" => [
                     ["main_photo", $p],
                 ],
@@ -100,9 +100,9 @@ class Update
                 " LEFT JOIN subjects ON subjects.subject_id = cities.subject_id " .
                 " LEFT JOIN countries ON countries.country_id = cities.country_id " .
                 " WHERE shops.user_id={$profileID} and shops.shop_id={$shop["shop_id"]}";
-            $adSelect = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            $shopSelect = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
             return ["status" => "ok",
-                "data" => ["ad" => $adSelect],
+                "data" => ["shop" => $shopSelect],
             ];
 
         } catch (RuntimeException | \Exception $e) {
