@@ -31,6 +31,7 @@ class Show
             // проверяем только заполненные параметры
             if (!$vMethods->isValidFilled([
                 "emptyParamsFilled" => [
+                    ["user_id", $p], ["users_id", $p],
                     ["ad_id", $p], ["ads_id", $p],
                     ["sort_id", $p], ["page", $p],
                     ["countries_id", $p], ["subjects_id", $p], ["cities_id", $p],
@@ -39,7 +40,8 @@ class Show
                     ["fuel_id", $p], ["power", $p], ["power2", $p], ["volume", $p], ["volume2", $p],
                     ["wheel_id", $p], ["document_id", $p], ["state_id", $p], ["exchange_id", $p],
                 ],
-                "isInt" => [
+                "isInt" => [     
+                    ["user_id", $p], 
                     ["ad_id", $p],
                     ["sort_id", $p], ["page", $p],
                     ["drive_id", $p], ["transmission_id", $p], ["body_id", $p], ["mileage", $p], ["mileage2", $p],
@@ -47,6 +49,7 @@ class Show
                     ["wheel_id", $p], ["document_id", $p], ["state_id", $p], ["exchange_id", $p],
                 ],
                 "isArray" => [
+                    ["users_id", $p],
                     ["ads_id", $p],
                     ["countries_id", $p], ["subjects_id", $p], ["cities_id", $p],
                     ["models_id", $p], ["brands_id", $p], ["types_id", $p],
@@ -75,6 +78,8 @@ class Show
             $qSort .= $sortID == 12 ? "ads.power ASC,  " : "";
 
             // строим запрос выборки
+            $qWhere = $qWhere . (empty($p["user_id"]) ? "" : " ads.user_id=" . $p["user_id"] . " and ");
+            $qWhere = $qWhere . (empty($p["users_id"]) ? "" : "ads.user_id in (" . implode(', ', $p["users_id"]) . ") and ");
             $qWhere = $qWhere . (empty($p["ad_id"]) ? "" : "ads.ad_id=" . $p["ad_id"] . " and ");
             $qWhere = $qWhere . (empty($p["ads_id"]) ? "" : "ads.ad_id in (" . implode(', ', $p["ads_id"]) . ") and ");
             //для местоположения
