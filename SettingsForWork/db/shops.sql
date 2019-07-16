@@ -65,7 +65,8 @@ CREATE TABLE "shops" (
     PRIMARY KEY (user_id, shop_id),
     FOREIGN KEY (city_id) REFERENCES cities(city_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
--- таблица катлог продукции
+
+-- таблица каталоги продуктов,товаров, услуг
 CREATE TABLE "catalogs" (
     user_id bigint NOT NULL,  
     shop_id bigint NOT NULL,
@@ -98,7 +99,10 @@ CREATE TABLE "products" (
     FOREIGN KEY (user_id, shop_id, catalog_id) REFERENCES catalogs(user_id, shop_id, catalog_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
+ALTER TABLE "shops"
+ADD CONSTRAINT unique_shops_title UNIQUE (user_id, title);
+ALTER TABLE "catalogs"
+ADD CONSTRAINT unique_catalogs_title UNIQUE (shop_id, title);
 
 
 -- drop table products;
