@@ -27,7 +27,7 @@ class Update
             if (!$vMethods->isValid([
                 "emptyParams" => [
                     ["access_token", $p],
-                    ["shop_id", $p],
+                    ["catalog_id", $p],
                 ]])) {
                 $exceptions = $vMethods->getExceptions();
                 throw new \Exception("Ошибки в параметрах.");
@@ -36,13 +36,13 @@ class Update
             // проверяем только заполненные параметры
             if (!$vMethods->isValidFilled([
                 "emptyParamsFilled" => [
-                    ["shop_id", $p],
+                    ["catalog_id", $p],
                     ["main_photo", $p],
                     ["title", $p],
                 ],
                 "isAccessToken" => [["access_token", $p]],
                 "isNumeric" => [
-                    ["shop_id", $p],
+                    ["catalog_id", $p],
                 ],
                 "uri" => [
                     ["main_photo", $p],
@@ -84,25 +84,20 @@ class Update
             }
 
             // пишем в базу
-            $q = "update shops set {$qSet} where user_id={$profileID} and shop_id={$p["shop_id"]} RETURNING *;";
+            $q = "update catalogs set {$qSet} where user_id={$profileID} and catalog_id={$p["catalog_id"]} RETURNING *;";
             $db = $this->container['db'];
-            $shop = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-            if (empty($shop["user_id"])) {
+            $catalog = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            if (empty($catalog["user_id"])) {
                 throw new \Exception("Такое объявление не существует.");
             }
             $q =
-                " select shops.shop_id as shop_id, shops.user_id as user_id, shops.date_create, shops.description, " .
-                " shops.main_photo, shops.title as title, " .
-                " cities.city_id, cities.name as city, subjects.subject_id, subjects.name as subject, " .
-                " countries.country_id, countries.name as country " .
-                " from shops " .
-                " LEFT JOIN cities ON cities.city_id = shops.city_id " .
-                " LEFT JOIN subjects ON subjects.subject_id = cities.subject_id " .
-                " LEFT JOIN countries ON countries.country_id = cities.country_id " .
-                " WHERE shops.user_id={$profileID} and shops.shop_id={$shop["shop_id"]}";
-            $shopSelect = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+                " select catalogs.catalog_id as catalog_id, catalogs.user_id as user_id, catalogs.date_create, catalogs.description, " .
+                " catalogs.main_photo, catalogs.title as title " .
+                " from catalogs " .
+                " WHERE catalogs.user_id={$profileID} and catalogs.catalog_id={$catalog["catalog_id"]}";
+            $catalogSelect = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
             return ["status" => "ok",
-                "data" => ["shop" => $shopSelect],
+                "data" => ["catalog" => $catalogSelect],
             ];
 
         } catch (RuntimeException | \Exception $e) {

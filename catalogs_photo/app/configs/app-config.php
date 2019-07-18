@@ -1,0 +1,23 @@
+<?php
+// trusted_services - доверенные ip на которых размещены наши сервисы
+return [
+    'settings' => [
+        'displayErrorDetails' => true,
+        'addContentLengthHeader' => false,
+        'db' => [
+            'host' => "127.0.0.1",
+            'port' => '5432',
+            'user' => "suser",
+            'pass' => "suser",
+            'dbname' => "catalogsphotos",
+        ],
+        'name_servers' => "catalogsphoto",
+    ],
+    "closed_records" => [
+        "paths" => [
+            "/api/token/delete",
+            "/api/token/update",
+            "/api/dependencies/update",
+        ],
+    ],
+];

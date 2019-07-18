@@ -15,7 +15,7 @@ start /B cmd /K "C:\server\php\php-cgi.exe -b 127.0.0.1:9109 -c C:\server\php\ph
 start /B cmd /K "C:\server\php\php-cgi.exe -b 127.0.0.1:9110 -c C:\server\php\php.ini"
 start /B cmd /K "C:\server\php\php-cgi.exe -b 127.0.0.1:9111 -c C:\server\php\php.ini"
 start /B cmd /K "C:\server\php\php-cgi.exe -b 127.0.0.1:9112 -c C:\server\php\php.ini"
-
+start /B cmd /K "C:\server\php\php-cgi.exe -b 127.0.0.1:9113 -c C:\server\php\php.ini"
 ECHO Starting NGINX
 start nginx.exe
 
