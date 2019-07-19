@@ -62,7 +62,10 @@ class Delete
             // удаляем посты
             $q = "delete from posts where user_id={$profileID} and post_id={$postID}";
             $db = $this->container['db'];
-            $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            $result = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            if ($result === false) {
+                throw new \Exception("Удаление без результата.");
+            }
 
             // удаляем фотографии
             

@@ -26,8 +26,8 @@ class Delete
             if (empty($p["access_token"])) {
                 $exceptions["access_token"] = "Не указан.";
             }
-            if (empty($p["shop_id"])) {
-                $exceptions["shop_id"] = "Не указан.";
+            if (empty($p["catalog_id"])) {
+                $exceptions["catalog_id"] = "Не указан.";
             }
             if (!empty($exceptions)) {
                 throw new \Exception("Ошибки в параметрах.");
@@ -35,9 +35,9 @@ class Delete
 
             // проверяем параметры
             $accessToken = $p["access_token"];
-            $shopID = $p["shop_id"];
-            if (!is_numeric($shopID)) {
-                $exceptions["shop_id"] = "Не соответствует типу integer.";
+            $catalogID = $p["catalog_id"];
+            if (!is_numeric($catalogID)) {
+                $exceptions["catalog_id"] = "Не соответствует типу integer.";
                 throw new \Exception("Ошибки в параметрах.");
             }
 
@@ -56,14 +56,16 @@ class Delete
 
             // пишем в базу
             // удаляем лайки
-            // $q = "delete from votes where user_id={$profileID} and shop_id={$shopID}";
+            // $q = "delete from votes where user_id={$profileID} and catalog_id={$catalogID}";
             // $db = $this->container['db'];
             // $db->query($q, \PDO::FETCH_ASSOC)->fetch();
             // удаляем посты
-            $q = "delete from shops where user_id={$profileID} and shop_id={$shopID}";
+            $q = "delete from catalogs where user_id={$profileID} and catalog_id={$catalogID}";
             $db = $this->container['db'];
-            $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-
+            $result = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            if ($result === false) {
+                throw new \Exception("Удаление без результата.");
+            }
             // удаляем фотографии
 
             return ["status" => "ok",

@@ -63,7 +63,10 @@ class Delete
             $q = "delete from shops where user_id={$profileID} and shop_id={$shopID}";
             $db = $this->container['db'];
             $db->query($q, \PDO::FETCH_ASSOC)->fetch();
-
+            $result = $db->query($q, \PDO::FETCH_ASSOC)->fetch();
+            if ($result === false) {
+                throw new \Exception("Удаление без результата.");
+            }
             // удаляем фотографии
 
             return ["status" => "ok",
