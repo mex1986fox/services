@@ -88,9 +88,9 @@ CREATE TABLE "products" (
     description text,
     main_photo text,
     price money NOT NULL,
-    type_id INTEGER DEFAULT 0,
-    brand_id INTEGER DEFAULT 0,
-    model_id INTEGER DEFAULT 0,
+    type_id INTEGER DEFAULT null,
+    brand_id INTEGER DEFAULT null,
+    model_id INTEGER DEFAULT null,
     date_create timestamp default current_timestamp,
     PRIMARY KEY (user_id, shop_id, catalog_id, product_id),
     FOREIGN KEY (type_id) REFERENCES types(type_id) ON DELETE SET DEFAULT ON UPDATE CASCADE,
@@ -103,7 +103,8 @@ ALTER TABLE "shops"
 ADD CONSTRAINT unique_shops_title UNIQUE (user_id, title);
 ALTER TABLE "catalogs"
 ADD CONSTRAINT unique_catalogs_title UNIQUE (shop_id, title);
-
+ALTER TABLE "products"
+ADD CONSTRAINT unique_products_title UNIQUE (catalog_id, title);
 
 -- drop table products;
 -- drop table catalogs;
