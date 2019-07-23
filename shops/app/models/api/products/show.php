@@ -66,7 +66,7 @@ class Show
                 " products.product_id as product_id, products.date_create, products.description, " .
                 " models.model_id, models.name as model, brands.brand_id, brands.name as brand, " .
                 " types.type_id, types.name as type,  " .
-                " products.main_photo, products.title " .
+                " products.main_photo, products.title,  products.price::numeric(10,0) as price " .
                 " from products " .
                 " LEFT JOIN models ON models.model_id = products.model_id " .
                 " LEFT JOIN brands ON brands.brand_id = products.brand_id " .
