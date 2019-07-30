@@ -61,32 +61,48 @@ class Create
                 $exceptions = $vMethods->getExceptions();
                 throw new \Exception("Ошибки в параметрах.");
             }
+            // проверяем только заполненные параметры
+            if (!$vMethods->isValidFilled([
+                "emptyParamsFilled" => [
+                    ["type_id", $p],
+                    ["brand_id", $p],
+                    ["model_id", $p],
+                ],
+                "isNumeric" => [
+                    ["type_id", $p],
+                    ["brand_id", $p],
+                    ["model_id", $p],
+                ],
+            ])) {
+                $exceptions = $vMethods->getExceptions();
+                throw new \Exception("Ошибки в параметрах.");
+            }
 
             $tokenStructur = new TokenStructur($this->container);
             $tokenStructur->setToken($accessToken);
             $profileID = $tokenStructur->getUserID();
-            
-            // формируем под запросы 
-            $subquery="";
-            if (isset($p['type_id'])){
-                $subquery= ",null, null, select type_id from types where type_id={$p['type_id']}";
+
+            // формируем подзапросы
+            $subquery = "";
+            if (isset($p['type_id'])) {
+                $subquery = ",null, null, (select type_id from types where type_id={$p['type_id']})";
             }
-            if (isset($p['brand_id'])){
-                $subquery= ",null, select brand_id, type_id from brands where brand_id={$p['brand_id']}";
+            if (isset($p['brand_id'])) {
+                $subquery = ",null, (select brand_id from brands where brand_id={$p['brand_id']}),(select type_id from brands where brand_id={$p['brand_id']})";
             }
-            if (isset($p['model_id'])){
-                $subquery= "select model_id, brand_id, type_id from models where model_id={$p['model_id']}";
+            if (isset($p['model_id'])) {
+                $subquery = ",(select model_id from models where model_id={$p['model_id']}),(select brand_id from models where model_id={$p['model_id']}),(select type_id from models where model_id={$p['model_id']})";
             }
-            if($subquery==""){
-                $subquery=",null, null, null";
+            if ($subquery == "") {
+                $subquery = ",null, null, null";
             }
 
             // пишем в базу
             $db = $this->container['db'];
             $q = "insert into products
-                    (user_id, shop_id, catalog_id, description, title, price)
+                    (user_id, shop_id, catalog_id, description, title, price, model_id, brand_id, type_id)
                 values
-                    ({$profileID},{$shopID},{$catalogID},'{$description}','{$title}','{$price}')
+                    ({$profileID},{$shopID},{$catalogID},'{$description}','{$title}','{$price}'{$subquery})
                 returning *;";
             $sth = $db->query($q, \PDO::FETCH_ASSOC);
             $product = $sth->fetch();
@@ -99,6 +115,11 @@ class Create
             ];
         } catch (RuntimeException | \Exception $e) {
             $exceptions["massege"] = $e->getMessage();
+            if (strpos($exceptions["massege"], 'unique_products_title') !== false) {
+                $exceptions["title"] = "Уже существует.";
+                $exceptions["massege"] = "Ошибки в параметрах.";
+            }
+           
             return [
                 "status" => "except",
                 "data" => $exceptions,
